@@ -1,6 +1,6 @@
-import { Injectable } from "nestjs-injectable";
-import { User } from "../entities/User";
+// import { Injectable } from "nestjs-injectable";
+// import { User } from "../entities/User";
 
-export interface UserRepository {
-  findById(id: string): Promise<User>;
-}
+// export interface UserRepository {
+//   findById(id: string): Promise<User>;
+// }

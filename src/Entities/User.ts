@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import { Country } from "../Utils/Countries";
 
 @Entity()
 export class User {
@@ -10,4 +11,14 @@ export class User {
 
   @Column()
   lastName: string;
+
+  @Column()
+  age: number;
+
+  @Column({
+    type: "enum",
+    enum: Country,
+    default: Country.Romania,
+  })
+  nationality: Country;
 }

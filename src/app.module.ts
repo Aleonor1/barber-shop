@@ -5,15 +5,12 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "./Entities/User";
 import { Barber } from "./Entities/Barber";
 import { Client } from "./Entities/Client";
-import { BarberRepositoryImpl } from "./Repositories/BarberRepositoryImpl";
-import {
-  BARBER_SERVICE,
-  BarberServiceImpl,
-} from "./Services/BarberServiceImpl";
-import { BARBER_REPOSITORY } from "./Repositories/BarberRepository";
+import { BarberController } from "./Controllers/BarberController";
+import { BarberModule } from "./Modules/BarberModule";
 
 @Module({
   imports: [
+    BarberModule,
     TypeOrmModule.forRoot({
       type: "postgres",
       host: "localhost",
@@ -26,9 +23,6 @@ import { BARBER_REPOSITORY } from "./Repositories/BarberRepository";
     }),
   ],
   controllers: [AppController],
-  providers: [
-    { useClass: BarberRepositoryImpl, provide: BARBER_REPOSITORY },
-    AppService,
-  ],
+  providers: [AppService],
 })
 export class AppModule {}

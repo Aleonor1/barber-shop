@@ -1,25 +1,26 @@
 import { Barber } from "src/Entities/Barber";
-import { BarberService } from "./BarberService";
 import { Injectable } from "nestjs-injectable";
 import { Inject } from "@nestjs/common";
 import { BarberRepositoryImpl } from "src/Repositories/BarberRepositoryImpl";
-import { BARBER_REPOSITORY } from "src/Repositories/BarberRepository";
 
 export const BARBER_SERVICE = "BARBER-SERVICE-IMPL";
 
 Injectable();
-export class BarberServiceImpl implements BarberService {
+export class BarberServiceImpl {
   constructor(
-    @Inject(BARBER_REPOSITORY)
+    @Inject(BarberRepositoryImpl)
     private readonly barberRepository: BarberRepositoryImpl
   ) {}
 
-  getBarberById(id: string): Promise<Barber> {
-    return this.barberRepository.findById(id);
+  async getBarberById(id: string): Promise<Barber> {
+    return await this.barberRepository.findById(id);
   }
 
-  async saveBarber(barber: Barber): Promise<void> {
-    console.log(barber);
-    await this.barberRepository.saveBarber(barber);
+  async createOrUpdate(barber: Barber): Promise<void> {
+    await this.barberRepository.createOrUpdate(barber);
+  }
+
+  async getAllBarbers(): Promise<[Barber[], number]> {
+    return await this.barberRepository.getAllBarbers();
   }
 }

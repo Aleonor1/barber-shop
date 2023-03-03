@@ -1,4 +1,4 @@
-import { Controller, Get, Inject } from "@nestjs/common";
+import { Controller, Get, Inject, Post } from "@nestjs/common";
 import { AppService } from "./app.service";
 import { InjectRepository } from "@nestjs/typeorm";
 import { InsertQueryBuilder, Repository } from "typeorm";
@@ -8,13 +8,14 @@ import {
   BARBER_SERVICE,
   BarberServiceImpl,
 } from "./Services/BarberServiceImpl";
+import { Agent } from "http";
+import { Country } from "./Utils/Countries";
 
 @Controller()
 export class AppController {
   constructor(
     private readonly appService: AppService,
-    @Inject(BARBER_SERVICE)
-    private readonly barberService: BarberServiceImpl
+    @Inject(BARBER_SERVICE) private readonly barberService: BarberServiceImpl
   ) {}
 
   @Get()
@@ -22,8 +23,16 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  @Get()
-  insertBarber(): void {
-    this.barberService.saveBarber(new Barber("123", "florin", "gardos"));
+  @Post()
+  insertBarber(
+    lastName: string,
+    firstName: string,
+    age: number,
+    nationality: string
+  ): void {
+    const country = Country[nationality];
+    // this.barberService.createOrUpdate(
+    //   new Barber(firstName, lastName, age, country)
+    // );
   }
 }
