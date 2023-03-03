@@ -18,25 +18,54 @@ export class BasicAddressRepository {
     street: string
   ): Promise<BasicAddress> {
     return this.addressRepository
-      .createQueryBuilder()
+      .createQueryBuilder("basic_address")
       .select([
-        "address.addressId",
-        "address.name",
-        "address.city",
-        "address.country",
-        "address.postalCode",
-        "address.street",
+        "basic_address.addressId",
+        "basic_address.name",
+        "basic_address.city",
+        "basic_address.country",
+        "basic_address.postalCode",
+        "basic_address.street",
       ])
-      .where("address.name = :name", {
+      .where("basic_address.name = :name", {
         name,
       })
-      .andWhere("address.city = :city", {
+      .andWhere("basic_address.city = :city", {
         city,
       })
-      .andWhere("address.country = :country", { country })
-      .andWhere("address.postalCode", { postalCode })
-      .andWhere("address.street", { street })
+      .andWhere("basic_address.country = :country", {
+        country,
+      })
+      .andWhere("basic_address.postalCode = :postalCode", {
+        postalCode,
+      })
+      .andWhere("basic_address.street = :street", {
+        street,
+      })
       .getOne();
+  }
+
+  async createAddress(
+    name: string,
+    city: string,
+    country: string,
+    postalCode: string,
+    street: string
+  ): Promise<void> {
+    this.addressRepository
+      .createQueryBuilder()
+      .insert()
+      .into(BasicAddress)
+      .values([
+        {
+          name: name,
+          city: city,
+          street: street,
+          country: country,
+          postalCode: postalCode,
+        },
+      ])
+      .execute();
   }
 
   async findById(id: string): Promise<BasicAddress> {

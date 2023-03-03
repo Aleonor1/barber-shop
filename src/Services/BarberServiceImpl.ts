@@ -32,7 +32,7 @@ export class BarberServiceImpl {
     experience: ExperienceLevel,
     addressName?: string
   ): Promise<Barber> {
-    const address = await this.basicAddressRepository.findAddress(
+    let address = await this.handleAddress(
       addressName,
       city,
       country,
@@ -50,6 +50,41 @@ export class BarberServiceImpl {
     );
 
     return await this.barberRepository.createOrUpdate(newBarber);
+  }
+
+  private async handleAddress(
+    addressName: string,
+    city: string,
+    country: string,
+    street: string,
+    postalCode: string
+  ) {
+    let address = await this.basicAddressRepository.findAddress(
+      addressName,
+      city,
+      country,
+      street,
+      postalCode
+    );
+
+    if (!address) {
+      await this.basicAddressRepository.createAddress(
+        addressName,
+        city,
+        country,
+        street,
+        postalCode
+      );
+    }
+
+    address = await this.basicAddressRepository.findAddress(
+      addressName,
+      city,
+      country,
+      street,
+      postalCode
+    );
+    return address;
   }
 
   async getAllBarbers(): Promise<[Barber[], number]> {

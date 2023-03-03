@@ -21,6 +21,7 @@ import { BasicAddress } from "./Utils/Address";
       database: "",
       entities: [User, Barber, Client, BasicAddress],
       synchronize: true,
+      logging: true,
     }),
   ],
   controllers: [AppController],

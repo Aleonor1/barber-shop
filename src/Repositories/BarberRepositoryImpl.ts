@@ -22,7 +22,7 @@ export class BarberRepositoryImpl implements UserRepository {
     return this.barberRepository
       .createQueryBuilder("barber")
       .select(["barber.id", "barber.lastName", "barber.firstName"])
-      .where("buyer.id = :id", {
+      .where("barber.id = :id", {
         id,
       })
       .getOne();

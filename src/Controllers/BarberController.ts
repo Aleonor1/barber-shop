@@ -29,29 +29,18 @@ export class BarberController {
   }
 
   @Post("/create")
-  insertBarber(
-    @Param("lastName") lastName,
-    @Param("firstName") firstName,
-    @Param("age") age,
-    @Param("street") street,
-    @Param("city") city,
-    @Param("country") country,
-    @Param("postalCo") postalCode,
-    @Param("experience") experience,
-    @Param("addressName") addressName
-  ): void {
-    const nationality = Country[country];
+  insertBarber(@Body() body): void {
     this.barberService.createOrUpdate(
-      firstName,
-      lastName,
-      age,
-      nationality,
-      street,
-      city,
-      country,
-      postalCode,
-      experience,
-      addressName
+      body.firstName,
+      body.lastName,
+      body.age,
+      body.nationality,
+      body.street,
+      body.city,
+      body.country,
+      body.postalCode,
+      body.experience,
+      body.addressName
     );
   }
 }
