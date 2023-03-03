@@ -2,9 +2,10 @@ import { Injectable } from "nestjs-injectable";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, SelectQueryBuilder, getManager } from "typeorm";
 import { Barber } from "src/Entities/Barber";
+import { UserRepository } from "./UserRepository";
 
 @Injectable()
-export class BarberRepositoryImpl {
+export class BarberRepositoryImpl implements UserRepository {
   constructor(
     @InjectRepository(Barber)
     private readonly barberRepository: Repository<Barber>
@@ -27,7 +28,7 @@ export class BarberRepositoryImpl {
       .getOne();
   }
 
-  async createOrUpdate(barber: Barber): Promise<void> {
+  async createOrUpdate(barber: Barber): Promise<Barber> {
     await this.barberRepository
       .createQueryBuilder()
       .insert()
@@ -44,6 +45,8 @@ export class BarberRepositoryImpl {
         overwrite: ["firstName", "lastName"],
       })
       .execute();
+
+    return this.findById(barber.id);
   }
 
   async update(barber: Barber): Promise<void> {

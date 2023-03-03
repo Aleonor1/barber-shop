@@ -1,5 +1,13 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
+} from "typeorm";
 import { Country } from "../Utils/Countries";
+import { BasicAddress } from "src/Utils/Address";
+import { ExperienceLevel } from "src/Utils/ExperienceLevel";
 
 @Entity()
 export class User {
@@ -12,7 +20,7 @@ export class User {
   @Column()
   lastName: string;
 
-  @Column()
+  @Column({ nullable: false, type: "integer", default: 0 })
   age: number;
 
   @Column({
@@ -21,4 +29,16 @@ export class User {
     default: Country.Romania,
   })
   nationality: Country;
+
+  @OneToOne(() => BasicAddress)
+  @JoinColumn()
+  address: BasicAddress;
+
+  constructor(firstName, lastName, age, nationality, address) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.age = age;
+    this.nationality = nationality;
+    this.address = address;
+  }
 }

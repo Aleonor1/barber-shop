@@ -1,4 +1,13 @@
-import { Controller, Get, Inject, Post } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  Inject,
+  Param,
+  Post,
+  Req,
+} from "@nestjs/common";
+import { first } from "rxjs";
 import { Barber } from "src/Entities/Barber";
 import { BarberServiceImpl } from "src/Services/BarberServiceImpl";
 import { Country } from "src/Utils/Countries";
@@ -15,14 +24,34 @@ export class BarberController {
   }
 
   @Get("/:id")
-  getBarberById(): Promise<Barber> {
-    return this.barberService.getBarberById("asd");
+  getBarberById(@Param("id") id): Promise<Barber> {
+    return this.barberService.getBarberById(id);
   }
 
   @Post("/create")
-  createOrUpdate(barber: Barber): void {
+  insertBarber(
+    @Param("lastName") lastName,
+    @Param("firstName") firstName,
+    @Param("age") age,
+    @Param("street") street,
+    @Param("city") city,
+    @Param("country") country,
+    @Param("postalCo") postalCode,
+    @Param("experience") experience,
+    @Param("addressName") addressName
+  ): void {
+    const nationality = Country[country];
     this.barberService.createOrUpdate(
-      new Barber("Rusu", "Roxana", 18, Country.Romania)
+      firstName,
+      lastName,
+      age,
+      nationality,
+      street,
+      city,
+      country,
+      postalCode,
+      experience,
+      addressName
     );
   }
 }

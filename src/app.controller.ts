@@ -8,27 +8,10 @@ import { last } from "rxjs";
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-    @Inject(BarberController)
-    private readonly barberController: BarberController
-  ) {}
+  constructor(private readonly appService: AppService) {}
 
   @Get()
   getHello(): string {
     return this.appService.getHello();
-  }
-
-  @Post()
-  insertBarber(
-    lastName: string,
-    firstName: string,
-    age: number,
-    nationality: string
-  ): void {
-    const country = Country[nationality];
-    this.barberController.createOrUpdate(
-      new Barber(lastName, firstName, age, country)
-    );
   }
 }

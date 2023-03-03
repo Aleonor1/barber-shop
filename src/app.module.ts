@@ -5,9 +5,9 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { User } from "./Entities/User";
 import { Barber } from "./Entities/Barber";
 import { Client } from "./Entities/Client";
-import { BarberController } from "./Controllers/BarberController";
 import { BarberModule } from "./Modules/BarberModule";
-import { BarberServiceImpl } from "./Services/BarberServiceImpl";
+import { BarberController } from "./Controllers/BarberController";
+import { BasicAddress } from "./Utils/Address";
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { BarberServiceImpl } from "./Services/BarberServiceImpl";
       username: "postgres",
       password: "",
       database: "",
-      entities: [User, Barber, Client],
+      entities: [User, Barber, Client, BasicAddress],
       synchronize: true,
     }),
   ],
