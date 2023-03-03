@@ -7,6 +7,7 @@ import { Barber } from "./Entities/Barber";
 import { Client } from "./Entities/Client";
 import { BarberController } from "./Controllers/BarberController";
 import { BarberModule } from "./Modules/BarberModule";
+import { BarberServiceImpl } from "./Services/BarberServiceImpl";
 
 @Module({
   imports: [

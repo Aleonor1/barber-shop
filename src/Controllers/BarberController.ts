@@ -1,11 +1,14 @@
-import { Controller, Get, Post } from "@nestjs/common";
+import { Controller, Get, Inject, Post } from "@nestjs/common";
 import { Barber } from "src/Entities/Barber";
 import { BarberServiceImpl } from "src/Services/BarberServiceImpl";
 import { Country } from "src/Utils/Countries";
 
 @Controller("barber")
 export class BarberController {
-  constructor(private barberService: BarberServiceImpl) {}
+  constructor(
+    @Inject(BarberServiceImpl)
+    private readonly barberService: BarberServiceImpl
+  ) {}
   @Get("/")
   async getAllBarbers(): Promise<[Barber[], number]> {
     return await this.barberService.getAllBarbers();
@@ -17,7 +20,7 @@ export class BarberController {
   }
 
   @Post("/create")
-  createOrUpdate(): void {
+  createOrUpdate(barber: Barber): void {
     this.barberService.createOrUpdate(
       new Barber("Rusu", "Roxana", 18, Country.Romania)
     );

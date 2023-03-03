@@ -3,8 +3,6 @@ import { Injectable } from "nestjs-injectable";
 import { Inject } from "@nestjs/common";
 import { BarberRepositoryImpl } from "src/Repositories/BarberRepositoryImpl";
 
-export const BARBER_SERVICE = "BARBER-SERVICE-IMPL";
-
 Injectable();
 export class BarberServiceImpl {
   constructor(

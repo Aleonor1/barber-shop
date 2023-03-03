@@ -9,6 +9,6 @@ import { Repository } from "typeorm";
 @Module({
   imports: [TypeOrmModule.forFeature([Barber])],
   controllers: [BarberController],
-  providers: [BarberRepositoryImpl, BarberServiceImpl],
+  providers: [BarberServiceImpl, BarberRepositoryImpl],
 })
 export class BarberModule {}
