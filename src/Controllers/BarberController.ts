@@ -1,10 +1,14 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Inject,
   Param,
+  Patch,
   Post,
+  Put,
   Req,
 } from "@nestjs/common";
 import { first } from "rxjs";
@@ -24,11 +28,16 @@ export class BarberController {
   }
 
   @Get("/:id")
-  getBarberById(@Param("id") id): Promise<Barber> {
-    return this.barberService.getBarberById(id);
+  async getBarberById(@Param("id") id): Promise<Barber> {
+    const barber = await this.barberService.getBarberById(id);
+    if (barber) {
+      return barber;
+    } else {
+      throw new Error("Barber not found");
+    }
   }
 
-  @Post("/create")
+  @Post("/")
   insertBarber(@Body() body): void {
     this.barberService.createOrUpdate(
       body.firstName,
@@ -42,5 +51,20 @@ export class BarberController {
       body.experience,
       body.addressName
     );
+  }
+
+  @Patch("/:id")
+  update(@Param("id") id: string, newBarber: Barber) {
+    this.barberService.updateBarber(id, newBarber);
+  }
+
+  @Delete("/:id")
+  deleteBarber(@Param("id") id: string): void {
+    this.barberService.deleteBarber(id);
+  }
+
+  @Patch("/restore/:id")
+  restoreSoftDelete(@Param("id") id: string): void {
+    this.barberService.restoreSoftDelete(id);
   }
 }

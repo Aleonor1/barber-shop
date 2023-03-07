@@ -1,6 +1,11 @@
 import { Injectable } from "nestjs-injectable";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, SelectQueryBuilder, getManager } from "typeorm";
+import {
+  Repository,
+  SelectQueryBuilder,
+  UpdateResult,
+  getManager,
+} from "typeorm";
 import { Barber } from "src/Entities/Barber";
 import { UserRepository } from "./UserRepository";
 
@@ -49,29 +54,36 @@ export class BarberRepositoryImpl implements UserRepository {
     return this.findById(barber.id);
   }
 
-  async update(barber: Barber): Promise<void> {
+  async update(id: string, barber: Barber): Promise<Barber> {
     this.barberRepository
       .createQueryBuilder()
       .update(Barber)
       .set({
         firstName: barber.firstName,
         lastName: barber.lastName,
+        age: barber.age,
+        experience: barber.experience,
+        nationality: barber.nationality,
+        address: barber.address,
       })
       .where("id = :id", { id: barber.id });
+
+    return this.findById(id);
   }
 
-  async delete(barberId: string): Promise<void> {
-    this.barberRepository
-      .createQueryBuilder()
+  async delete(barberId: string): Promise<UpdateResult> {
+    return this.barberRepository
+      .createQueryBuilder("barber")
       .softDelete()
-      .from(Barber)
-      .where("id = :id", { id: barberId });
+      .where("id = :id", { id: barberId })
+      .execute();
   }
 
-  async restoreSoftDelete(barberId: string): Promise<void> {
-    this.barberRepository
+  async restoreSoftDelete(barberId: string): Promise<UpdateResult> {
+    return this.barberRepository
       .createQueryBuilder()
       .restore()
-      .where("id =: id", { id: barberId });
+      .where("id = :id", { id: barberId })
+      .execute();
   }
 }

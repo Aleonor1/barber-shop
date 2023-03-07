@@ -6,6 +6,7 @@ import { ExperienceLevel } from "src/Utils/ExperienceLevel";
 import exp from "constants";
 import { Country } from "src/Utils/Countries";
 import { BasicAddressRepository } from "src/Repositories/BasicAddressRepository";
+import { UpdateResult } from "typeorm";
 
 Injectable();
 export class BarberServiceImpl {
@@ -16,7 +17,7 @@ export class BarberServiceImpl {
     private readonly basicAddressRepository: BasicAddressRepository
   ) {}
 
-  async getBarberById(id: string): Promise<Barber> {
+  public async getBarberById(id: string): Promise<Barber> {
     return await this.barberRepository.findById(id);
   }
 
@@ -30,8 +31,13 @@ export class BarberServiceImpl {
     country: string,
     postalCode: string,
     experience: ExperienceLevel,
-    addressName?: string
+    addressName?: string,
+    id?: string
   ): Promise<Barber> {
+    let oldBarber = null;
+    if (id) {
+      oldBarber = await this.barberRepository.findById(id);
+    }
     let address = await this.handleAddress(
       addressName,
       city,
@@ -89,5 +95,17 @@ export class BarberServiceImpl {
 
   async getAllBarbers(): Promise<[Barber[], number]> {
     return await this.barberRepository.getAllBarbers();
+  }
+
+  async updateBarber(id: string, newBarber: Barber): Promise<Barber> {
+    return this.barberRepository.update(id, newBarber);
+  }
+
+  async deleteBarber(id: string): Promise<UpdateResult> {
+    return await this.barberRepository.delete(id);
+  }
+
+  async restoreSoftDelete(id: string): Promise<UpdateResult> {
+    return await this.barberRepository.restoreSoftDelete(id);
   }
 }

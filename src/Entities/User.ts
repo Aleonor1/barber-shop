@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   OneToOne,
   JoinColumn,
+  DeleteDateColumn,
 } from "typeorm";
 import { Country } from "../Utils/Countries";
 import { BasicAddress } from "src/Utils/Address";
@@ -41,4 +42,7 @@ export class User {
     this.nationality = nationality;
     this.address = address;
   }
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }
