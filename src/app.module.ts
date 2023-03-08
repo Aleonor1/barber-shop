@@ -6,10 +6,8 @@ import { User } from "./Entities/User";
 import { Barber } from "./Entities/Barber";
 import { Client } from "./Entities/Client";
 import { BarberModule } from "./Modules/BarberModule";
-import { BarberController } from "./Controllers/BarberController";
 import { BasicAddress } from "./Utils/Address";
-import { UsersModule } from "./users/users.module";
-import { ClientsModule } from "./Modules/clients.module";
+import { ClientsModule } from "./Modules/ClientModule";
 
 @Module({
   imports: [
@@ -25,7 +23,6 @@ import { ClientsModule } from "./Modules/clients.module";
       synchronize: true,
       logging: true,
     }),
-    UsersModule,
     ClientsModule,
   ],
   controllers: [AppController],

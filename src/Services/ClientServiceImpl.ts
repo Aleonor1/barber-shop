@@ -1,29 +1,40 @@
-import { Injectable } from "@nestjs/common";
-import { CreateClientDto } from "../Entities/dto/create-client.dto";
-import { UpdateClientDto } from "../Entities/dto/update-client.dto";
+import { Inject, Injectable } from "@nestjs/common";
+import { ClientRepositoryImpl } from "src/Repositories/ClientRepositoryImpl";
+import { ExperienceLevel } from "src/Utils/ExperienceLevel";
+import { Client } from "src/Entities/Client";
+import { BasicAddressRepository } from "src/Repositories/BasicAddressRepository";
 
 @Injectable()
 export class ClientsService {
   constructor(
     @Inject(ClientRepositoryImpl)
-    private readonly clientRepositoryImpl: BarberRepositoryImpl,
+    private readonly clientRepositoryImpl: ClientRepositoryImpl,
     @Inject(BasicAddressRepository)
     private readonly basicAddressRepository: BasicAddressRepository
   ) {}
-  create(
+
+  async create(
     firstName: string,
     lastName: string,
     age: number,
-    nationality: string,
     street: string,
     city: string,
     country: string,
     postalCode: string,
-    experience: ExperienceLevel,
     addressName?: string,
     id?: string
   ) {
-    return "This action adds a new client";
+    let address = await this.basicAddressRepository.handleAddress(
+      addressName,
+      city,
+      country,
+      street,
+      postalCode
+    );
+
+    const newClient = new Client(lastName, firstName, age, address, 0);
+
+    this.clientRepositoryImpl.createOrUpdate(newClient);
   }
 
   findAll() {
@@ -34,9 +45,9 @@ export class ClientsService {
     return `This action returns a #${id} client`;
   }
 
-  update(id: number, updateClientDto: UpdateClientDto) {
-    return `This action updates a #${id} client`;
-  }
+  // update(id: number, updateClientDto: UpdateClientDto) {
+  //   return `This action updates a #${id} client`;
+  // }
 
   remove(id: number) {
     return `This action removes a #${id} client`;

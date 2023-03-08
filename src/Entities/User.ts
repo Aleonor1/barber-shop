@@ -35,7 +35,13 @@ export class User {
   @JoinColumn()
   address: BasicAddress;
 
-  constructor(firstName, lastName, age, nationality, address) {
+  constructor(
+    firstName: string,
+    lastName: string,
+    age: number,
+    nationality: Country,
+    address: BasicAddress
+  ) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.age = age;

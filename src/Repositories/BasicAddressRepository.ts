@@ -81,4 +81,33 @@ export class BasicAddressRepository {
       ])
       .getOne();
   }
+
+  public async handleAddress(
+    addressName: string,
+    city: string,
+    country: string,
+    street: string,
+    postalCode: string
+  ) {
+    let address = await this.findAddress(
+      addressName,
+      city,
+      country,
+      street,
+      postalCode
+    );
+
+    if (!address) {
+      await this.createAddress(addressName, city, country, street, postalCode);
+    }
+
+    address = await this.findAddress(
+      addressName,
+      city,
+      country,
+      street,
+      postalCode
+    );
+    return address;
+  }
 }

@@ -7,6 +7,7 @@ import exp from "constants";
 import { Country } from "src/Utils/Countries";
 import { BasicAddressRepository } from "src/Repositories/BasicAddressRepository";
 import { UpdateResult } from "typeorm";
+import { BarberBuilderImpl } from "src/Builder/BarberBuilderImpl";
 
 Injectable();
 export class BarberServiceImpl {
@@ -38,7 +39,7 @@ export class BarberServiceImpl {
     if (id) {
       oldBarber = await this.barberRepository.findById(id);
     }
-    let address = await this.handleAddress(
+    let address = await this.basicAddressRepository.handleAddress(
       addressName,
       city,
       country,
@@ -46,51 +47,16 @@ export class BarberServiceImpl {
       postalCode
     );
 
-    const newBarber = new Barber(
-      lastName,
-      firstName,
-      age,
-      address,
-      experience,
-      Country[nationality]
-    );
+    const newBarber = new BarberBuilderImpl()
+      .setLastName(lastName)
+      .setFirstName(firstName)
+      .setAge(age)
+      .setAddress(address)
+      .setExperience(experience)
+      .setNationality(Country[nationality])
+      .build();
 
     return await this.barberRepository.createOrUpdate(newBarber);
-  }
-
-  private async handleAddress(
-    addressName: string,
-    city: string,
-    country: string,
-    street: string,
-    postalCode: string
-  ) {
-    let address = await this.basicAddressRepository.findAddress(
-      addressName,
-      city,
-      country,
-      street,
-      postalCode
-    );
-
-    if (!address) {
-      await this.basicAddressRepository.createAddress(
-        addressName,
-        city,
-        country,
-        street,
-        postalCode
-      );
-    }
-
-    address = await this.basicAddressRepository.findAddress(
-      addressName,
-      city,
-      country,
-      street,
-      postalCode
-    );
-    return address;
   }
 
   async getAllBarbers(): Promise<[Barber[], number]> {
