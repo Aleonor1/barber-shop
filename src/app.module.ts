@@ -8,10 +8,14 @@ import { Client } from "./Entities/Client";
 import { BarberModule } from "./Modules/BarberModule";
 import { BasicAddress } from "./Utils/Address";
 import { ClientsModule } from "./Modules/ClientModule";
+import { Country } from "./Entities/Country";
+import { CountryRepositoryImpl } from "./Repositories/CountryRepositoryImpl";
+import { CountryModule } from "./Modules/CountryModule";
 
 @Module({
   imports: [
     BarberModule,
+    TypeOrmModule.forFeature([Country]),
     TypeOrmModule.forRoot({
       type: "postgres",
       host: "localhost",
@@ -19,13 +23,14 @@ import { ClientsModule } from "./Modules/ClientModule";
       username: "postgres",
       password: "",
       database: "",
-      entities: [User, Barber, Client, BasicAddress],
+      entities: [User, Barber, Client, BasicAddress, Country],
       synchronize: true,
       logging: true,
     }),
     ClientsModule,
+    CountryModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, CountryRepositoryImpl],
 })
 export class AppModule {}

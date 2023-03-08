@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./User";
-import { Country } from "src/Utils/Countries";
 import { BasicAddress } from "src/Utils/Address";
+import { Country } from "./Country";
 
 @Entity()
 export class Client extends User {
@@ -13,10 +13,11 @@ export class Client extends User {
     firstName: string,
     age: number,
     address: BasicAddress,
-    fidelity?: number,
-    nationality?: Country
+    email: string,
+    nationalities?: Country[],
+    fidelity?: number
   ) {
-    super(lastName, firstName, age, nationality, address);
+    super(lastName, firstName, age, nationalities, address, email);
     this.fidelityLevel = fidelity;
   }
 }

@@ -6,9 +6,9 @@ import {
   JoinColumn,
   DeleteDateColumn,
 } from "typeorm";
-import { Country } from "../Utils/Countries";
 import { BasicAddress } from "src/Utils/Address";
 import { ExperienceLevel } from "src/Utils/ExperienceLevel";
+import { Country } from "./Country";
 
 @Entity()
 export class User {
@@ -24,12 +24,9 @@ export class User {
   @Column({ nullable: false, type: "integer", default: 0 })
   age: number;
 
-  @Column({
-    type: "enum",
-    enum: Country,
-    default: Country.Romania,
-  })
-  nationality: Country;
+  @OneToOne(() => Country)
+  @JoinColumn()
+  nationalities: Country[];
 
   @OneToOne(() => BasicAddress)
   @JoinColumn()
@@ -39,16 +36,24 @@ export class User {
     firstName: string,
     lastName: string,
     age: number,
-    nationality: Country,
-    address: BasicAddress
+    nationalities: Country[],
+    address: BasicAddress,
+    email: string
   ) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.age = age;
-    this.nationality = nationality;
+    this.nationalities = nationalities;
     this.address = address;
+    this.email = email;
   }
 
   @DeleteDateColumn()
   deletedAt?: Date;
+
+  @Column({ unique: true })
+  email: string;
+
+  @Column({ default: false })
+  isEmailConfirmed: boolean;
 }

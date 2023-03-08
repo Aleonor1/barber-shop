@@ -8,13 +8,15 @@ import {
   Delete,
 } from "@nestjs/common";
 import { ClientsService } from "../Services/ClientServiceImpl";
+import { Client } from "src/Entities/Client";
+import { CleintDto } from "src/DTOS/ClientDto.dts";
 
 @Controller("clients")
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
   @Post()
-  create(@Body() body) {
+  create(@Body() body: CleintDto) {
     this.clientsService.create(
       body.firstName,
       body.lastName,
@@ -23,8 +25,9 @@ export class ClientsController {
       body.city,
       body.country,
       body.postalCode,
-      body.experience,
-      body.addressName
+      body.addressName,
+      body.email,
+      body.nationalities
     );
   }
 
@@ -35,7 +38,7 @@ export class ClientsController {
 
   @Get(":id")
   findOne(@Param("id") id: string) {
-    return this.clientsService.findOne(+id);
+    return this.clientsService.findOne(id);
   }
 
   // @Patch(":id")
@@ -45,6 +48,11 @@ export class ClientsController {
 
   @Delete(":id")
   remove(@Param("id") id: string) {
-    return this.clientsService.remove(+id);
+    return this.clientsService.deleteBarber(id);
+  }
+
+  @Patch("/restore/:id")
+  restoreSoftDelete(@Param("id") id: string): void {
+    this.clientsService.restoreSoftDelete(id);
   }
 }

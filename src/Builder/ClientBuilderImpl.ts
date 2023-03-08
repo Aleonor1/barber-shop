@@ -1,20 +1,19 @@
 import { User } from "src/Entities/User";
 import { UserBuilder } from "./Builder";
 import { BasicAddress } from "src/Utils/Address";
-import { Country } from "src/Utils/Countries";
-import { Barber } from "src/Entities/Barber";
-import { first } from "rxjs";
-import { ExperienceLevel } from "src/Utils/ExperienceLevel";
 import { Client } from "src/Entities/Client";
+import { Country } from "src/Entities/Country";
+import { IsEmail } from "class-validator";
 
 export class ClientBuilderImpl implements UserBuilder {
   public firstName: string;
   public lastName: string;
   public age: number;
-  public nationality: Country;
+  public nationalities: Country[];
   public address: BasicAddress;
   public deletedAt?: Date;
   public fidelityLevel: number;
+  public email: string;
 
   public setFidelityLevel(fidelityLevel: number) {
     this.fidelityLevel = fidelityLevel;
@@ -36,13 +35,18 @@ export class ClientBuilderImpl implements UserBuilder {
     return this;
   }
 
-  public setNationality(nationality: Country) {
-    this.nationality = nationality;
+  public setNationalities(nationalities: Country[]) {
+    this.nationalities = nationalities;
     return this;
   }
 
   public setAddress(address: BasicAddress) {
     this.address = address;
+    return this;
+  }
+
+  public setEmail(email: string) {
+    this.email = email;
     return this;
   }
 
@@ -57,7 +61,9 @@ export class ClientBuilderImpl implements UserBuilder {
       this.firstName,
       this.age,
       this.address,
-      this.fidelityLevel
+      this.email,
+      this.nationalities,
+      0
     );
   }
 }

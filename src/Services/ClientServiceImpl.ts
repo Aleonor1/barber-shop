@@ -3,6 +3,9 @@ import { ClientRepositoryImpl } from "src/Repositories/ClientRepositoryImpl";
 import { ExperienceLevel } from "src/Utils/ExperienceLevel";
 import { Client } from "src/Entities/Client";
 import { BasicAddressRepository } from "src/Repositories/BasicAddressRepository";
+import { Country } from "src/Entities/Country";
+import { UpdateResult } from "typeorm";
+import { emitWarning } from "process";
 
 @Injectable()
 export class ClientsService {
@@ -21,8 +24,9 @@ export class ClientsService {
     city: string,
     country: string,
     postalCode: string,
-    addressName?: string,
-    id?: string
+    addressName: string,
+    email: string,
+    nationalities: Country[]
   ) {
     let address = await this.basicAddressRepository.handleAddress(
       addressName,
@@ -32,24 +36,32 @@ export class ClientsService {
       postalCode
     );
 
-    const newClient = new Client(lastName, firstName, age, address, 0);
+    const newClient = new Client(
+      lastName,
+      firstName,
+      age,
+      address,
+      email,
+      nationalities,
+      0
+    );
 
     this.clientRepositoryImpl.createOrUpdate(newClient);
   }
 
   findAll() {
-    return `This action returns all clients`;
+    return this.clientRepositoryImpl.getAllClients();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} client`;
+  findOne(id: string) {
+    return this.clientRepositoryImpl.findById(id);
   }
 
-  // update(id: number, updateClientDto: UpdateClientDto) {
-  //   return `This action updates a #${id} client`;
-  // }
+  async deleteBarber(id: string): Promise<UpdateResult> {
+    return await this.clientRepositoryImpl.delete(id);
+  }
 
-  remove(id: number) {
-    return `This action removes a #${id} client`;
+  async restoreSoftDelete(id: string): Promise<UpdateResult> {
+    return await this.clientRepositoryImpl.restoreSoftDelete(id);
   }
 }

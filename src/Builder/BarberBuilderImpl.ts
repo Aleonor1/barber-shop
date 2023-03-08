@@ -1,19 +1,20 @@
 import { User } from "src/Entities/User";
 import { UserBuilder } from "./Builder";
 import { BasicAddress } from "src/Utils/Address";
-import { Country } from "src/Utils/Countries";
 import { Barber } from "src/Entities/Barber";
 import { first } from "rxjs";
 import { ExperienceLevel } from "src/Utils/ExperienceLevel";
+import { Country } from "src/Entities/Country";
 
 export class BarberBuilderImpl implements UserBuilder {
   public firstName: string;
   public lastName: string;
   public age: number;
-  public nationality: Country;
+  public nationalities: Country[];
   public address: BasicAddress;
   public deletedAt?: Date;
   public experience: ExperienceLevel;
+  public email: string;
 
   public setExperience(experience: ExperienceLevel) {
     this.experience = experience;
@@ -35,8 +36,8 @@ export class BarberBuilderImpl implements UserBuilder {
     return this;
   }
 
-  public setNationality(nationality: Country) {
-    this.nationality = nationality;
+  public setNationalities(nationalities: Country[]) {
+    this.nationalities = nationalities;
     return this;
   }
 
@@ -50,14 +51,20 @@ export class BarberBuilderImpl implements UserBuilder {
     return this;
   }
 
+  public setEmail(email: string) {
+    this.email = email;
+    return this;
+  }
+
   build(): Barber {
     return new Barber(
       this.lastName,
       this.firstName,
       this.age,
       this.address,
+      this.email,
       this.experience,
-      this.nationality
+      this.nationalities
     );
   }
 }

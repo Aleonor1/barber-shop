@@ -1,8 +1,8 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "./User";
-import { Country } from "src/Utils/Countries";
 import { ExperienceLevel } from "src/Utils/ExperienceLevel";
 import { BasicAddress } from "src/Utils/Address";
+import { Country } from "./Country";
 
 @Entity()
 export class Barber extends User {
@@ -18,10 +18,11 @@ export class Barber extends User {
     firstName: string,
     age: number,
     address: BasicAddress,
+    email: string,
     experience?: ExperienceLevel,
-    nationality?: Country
+    nationalities?: Country[]
   ) {
-    super(lastName, firstName, age, nationality, address);
+    super(lastName, firstName, age, nationalities, address, email);
     this.experience = experience;
   }
 }

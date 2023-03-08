@@ -43,6 +43,11 @@ export class BarberRepositoryImpl implements UserRepository {
           id: barber.id,
           firstName: barber.firstName,
           lastName: barber.lastName,
+          age: barber.age,
+          email: barber.email,
+          experience: barber.experience,
+          nationalities: barber.nationalities,
+          address: barber.address,
         },
       ])
       .orUpdate({
@@ -63,7 +68,7 @@ export class BarberRepositoryImpl implements UserRepository {
         lastName: barber.lastName,
         age: barber.age,
         experience: barber.experience,
-        nationality: barber.nationality,
+        nationalities: barber.nationalities,
         address: barber.address,
       })
       .where("id = :id", { id: barber.id });

@@ -63,7 +63,7 @@ export class ClientRepositoryImpl implements UserRepository {
         lastName: client.lastName,
         age: client.age,
         fidelityLevel: client.fidelityLevel,
-        nationality: client.nationality,
+        nationalities: client.nationalities,
         address: client.address,
       })
       .where("id = :id", { id: client.id });
