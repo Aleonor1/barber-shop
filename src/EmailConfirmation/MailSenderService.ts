@@ -5,9 +5,21 @@ import { Client } from "src/Entities/Client";
 
 @Injectable()
 export class MailSenderService {
-  constructor() {}
+  private static instance: MailSenderService;
+  private constructor() {}
 
-  public async sendMail(): Promise<void> {
+  public static getInstance(): MailSenderService {
+    if (!MailSenderService.instance) {
+      MailSenderService.instance = new MailSenderService();
+    }
+    return MailSenderService.instance;
+  }
+
+  public async sendMail(
+    mail: string,
+    token: string,
+    id: string
+  ): Promise<void> {
     const transporter = nodemailer.createTransport({
       host: "smtp.zoho.eu",
       port: 465,
@@ -17,14 +29,16 @@ export class MailSenderService {
 
     const mailOptions = {
       from: "aleonorbarbershop@zohomail.eu",
-      to: "aleonornyikita@gmail.com",
+      to: mail,
       subject: "Email confirmation",
-      text: " Press here to send email",
+      text: `Click on the following link to activate your account: http://localhost:3000/clients/verify/${id}/${token}}`,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.log(error);
+      } else {
+        console.log(info);
       }
     });
   }
