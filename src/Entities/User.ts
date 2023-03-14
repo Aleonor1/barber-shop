@@ -7,7 +7,6 @@ import {
   DeleteDateColumn,
 } from "typeorm";
 import { BasicAddress } from "src/Utils/Address";
-import { ExperienceLevel } from "src/Utils/ExperienceLevel";
 import { Country } from "./Country";
 
 @Entity()
@@ -53,7 +52,4 @@ export class User {
 
   @Column({ unique: true })
   email: string;
-
-  @Column({ default: false })
-  isEmailConfirmed: boolean;
 }

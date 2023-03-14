@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import { UserRepository } from "./UserRepository";
 import { Client } from "src/Entities/Client";
+import { MailSenderService } from "src/EmailConfirmation/MailSenderService";
 
 @Injectable()
 export class ClientRepositoryImpl implements UserRepository {
@@ -19,16 +20,59 @@ export class ClientRepositoryImpl implements UserRepository {
   async getAllClients(): Promise<[Client[], number]> {
     return this.clientRepositories
       .createQueryBuilder("client")
-      .select(["client.id", "client.lastName", "client.firstName"])
+      .select([
+        "client.id",
+        "client.lastName",
+        "client.firstName",
+        "client.age",
+        "client.email",
+        "client.fidelityLevel",
+        "client.nationalities",
+        "client.address",
+        "client.status",
+        "client.token",
+      ])
       .getManyAndCount();
   }
 
   async findById(id: string): Promise<Client> {
     return this.clientRepositories
       .createQueryBuilder("client")
-      .select(["client.id", "client.lastName", "client.firstName"])
+      .select([
+        "client.id",
+        "client.lastName",
+        "client.firstName",
+        "client.age",
+        "client.email",
+        "client.fidelityLevel",
+        "client.nationalities",
+        "client.address",
+        "client.status",
+        "client.token",
+      ])
       .where("client.id = :id", {
         id,
+      })
+      .getOne();
+  }
+
+  async findByGeneric(field: string, value: string): Promise<Client> {
+    return this.clientRepositories
+      .createQueryBuilder("client")
+      .select([
+        "client.id",
+        "client.lastName",
+        "client.firstName",
+        "client.age",
+        "client.email",
+        "client.fidelityLevel",
+        "client.nationalities",
+        "client.address",
+        "client.status",
+        "client.token",
+      ])
+      .where(`client.${field} = :value`, {
+        value,
       })
       .getOne();
   }
@@ -40,9 +84,15 @@ export class ClientRepositoryImpl implements UserRepository {
       .into(Client)
       .values([
         {
-          id: client.id,
           firstName: client.firstName,
           lastName: client.lastName,
+          age: client.age,
+          email: client.email,
+          fidelityLevel: client.fidelityLevel,
+          nationalities: client.nationalities,
+          address: client.address,
+          status: client.status,
+          token: client.token,
         },
       ])
       .orUpdate({
@@ -51,7 +101,7 @@ export class ClientRepositoryImpl implements UserRepository {
       })
       .execute();
 
-    return this.findById(client.id);
+    return this.findByGeneric("email", client.email);
   }
 
   async update(id: string, client: Client): Promise<Client> {
@@ -62,6 +112,7 @@ export class ClientRepositoryImpl implements UserRepository {
         firstName: client.firstName,
         lastName: client.lastName,
         age: client.age,
+        email: client.email,
         fidelityLevel: client.fidelityLevel,
         nationalities: client.nationalities,
         address: client.address,
@@ -71,19 +122,34 @@ export class ClientRepositoryImpl implements UserRepository {
     return this.findById(id);
   }
 
-  async delete(clientId: string): Promise<UpdateResult> {
-    return this.clientRepositories
+  async verifyUser(client: Client): Promise<Client> {
+    this.clientRepositories
+      .createQueryBuilder()
+      .update(Client)
+      .set({ status: client.status })
+      .where("id = :id", { id: client.id })
+      .execute();
+
+    return this.findById(client.id);
+  }
+
+  async delete(clientId: string): Promise<Client> {
+    this.clientRepositories
       .createQueryBuilder("client")
       .softDelete()
       .where("id = :id", { id: clientId })
       .execute();
+
+    return this.findById(clientId);
   }
 
-  async restoreSoftDelete(clientId: string): Promise<UpdateResult> {
-    return this.clientRepositories
+  async restoreSoftDelete(clientId: string): Promise<Client> {
+    this.clientRepositories
       .createQueryBuilder()
       .restore()
       .where("id = :id", { id: clientId })
       .execute();
+
+    return this.findById(clientId);
   }
 }

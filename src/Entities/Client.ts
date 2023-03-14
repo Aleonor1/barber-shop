@@ -6,11 +6,14 @@ import { statusEnum } from "src/EmailConfirmation/Status";
 
 @Entity()
 export class Client extends User {
-  @Column()
+  @Column({ default: 0 })
   fidelityLevel: number;
 
   @Column()
   status: statusEnum;
+
+  @Column()
+  token: string;
 
   constructor(
     lastName: string,
@@ -18,11 +21,12 @@ export class Client extends User {
     age: number,
     address: BasicAddress,
     email: string,
-    nationalities?: Country[],
-    fidelity?: number
+    token: string,
+    nationalities?: Country[]
   ) {
     super(lastName, firstName, age, nationalities, address, email);
-    this.fidelityLevel = fidelity;
+    this.fidelityLevel = 0;
     this.status = statusEnum.pending;
+    this.token = token;
   }
 }

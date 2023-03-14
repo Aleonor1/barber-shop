@@ -5,9 +5,6 @@ import { MailSenderService } from "./EmailConfirmation/MailSenderService";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const mailSender = new MailSenderService();
-  mailSender.sendMail();
-
   // const options = new DocumentBuilder()
   //   .addBearerAuth()
   //   .setTitle("JS Code Api")
