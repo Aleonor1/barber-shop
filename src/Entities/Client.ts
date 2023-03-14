@@ -22,9 +22,20 @@ export class Client extends User {
     address: BasicAddress,
     email: string,
     token: string,
+    username: string,
+    password: string,
     nationalities?: Country[]
   ) {
-    super(lastName, firstName, age, nationalities, address, email);
+    super(
+      lastName,
+      firstName,
+      age,
+      nationalities,
+      address,
+      email,
+      username,
+      password
+    );
     this.fidelityLevel = 0;
     this.status = statusEnum.pending;
     this.token = token;

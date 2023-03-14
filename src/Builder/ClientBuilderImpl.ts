@@ -16,6 +16,13 @@ export class ClientBuilderImpl implements UserBuilder {
   public email: string;
   public token: string;
   public status: string;
+  public username: string;
+  public password: string;
+
+  public setPassword(password: string) {
+    this.password = password;
+    return this;
+  }
 
   public setStatus(status: statusEnum) {
     this.status = status;
@@ -67,6 +74,11 @@ export class ClientBuilderImpl implements UserBuilder {
     return this;
   }
 
+  public setUsername(username: string) {
+    this.username = username;
+    return this;
+  }
+
   build(): Client {
     return new Client(
       this.lastName,
@@ -75,6 +87,8 @@ export class ClientBuilderImpl implements UserBuilder {
       this.address,
       this.email,
       this.token,
+      this.username,
+      this.password,
       this.nationalities
     );
   }

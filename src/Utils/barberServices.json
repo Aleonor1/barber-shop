@@ -1,0 +1,9 @@
+[
+  { "code": "DIRECTORS_CUT", "string": "Directors cut" },
+  { "code": "CUT_WITH_SCISSORS", "string": "Cut with scissors" },
+  { "code": "BEARD_COLOR", "string": "Beard color" },
+  { "code": "HOT_TOWEL_SHAVE", "string": "Hot towel shave" },
+  { "code": "STYLING", "string": "Styling" },
+  { "code": "CAPILLARY_MASSAGE", "string": "Capillary massage" },
+  { "code": "EXTRA_WASH", "string": "Extra Wash" }
+]

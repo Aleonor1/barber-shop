@@ -5,6 +5,7 @@ import { Barber } from "src/Entities/Barber";
 import { first } from "rxjs";
 import { ExperienceLevel } from "src/Utils/ExperienceLevel";
 import { Country } from "src/Entities/Country";
+import { Year } from "src/Entities/Appointments/Year";
 
 export class BarberBuilderImpl implements UserBuilder {
   public firstName: string;
@@ -15,9 +16,17 @@ export class BarberBuilderImpl implements UserBuilder {
   public deletedAt?: Date;
   public experience: ExperienceLevel;
   public email: string;
+  public username: string;
+  public password: string;
+  public year: Year;
 
   public setExperience(experience: ExperienceLevel) {
     this.experience = experience;
+    return this;
+  }
+
+  public setYear(year: Year) {
+    this.year = year;
     return this;
   }
 
@@ -26,8 +35,18 @@ export class BarberBuilderImpl implements UserBuilder {
     return this;
   }
 
+  public setPassword(password: string) {
+    this.password = password;
+    return this;
+  }
+
   public setLastName(lastName: string) {
     this.lastName = lastName;
+    return this;
+  }
+
+  public setUsername(username: string) {
+    this.username = username;
     return this;
   }
 
@@ -63,6 +82,9 @@ export class BarberBuilderImpl implements UserBuilder {
       this.age,
       this.address,
       this.email,
+      this.username,
+      this.password,
+      this.year,
       this.experience,
       this.nationalities
     );

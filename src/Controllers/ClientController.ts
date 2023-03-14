@@ -9,12 +9,14 @@ import {
   Res,
   HttpStatus,
   GoneException,
+  UseGuards,
 } from "@nestjs/common";
 import { ClientsService } from "../Services/ClientServiceImpl";
 import { Client } from "src/Entities/Client";
 import { CleintDto } from "src/DTOS/ClientDto.dts";
 import { statusEnum } from "src/EmailConfirmation/Status";
 import { Response } from "express";
+import { AuthGuard } from "@nestjs/passport";
 
 @Controller("clients")
 export class ClientsController {
@@ -32,7 +34,9 @@ export class ClientsController {
       body.postalCode,
       body.addressName,
       body.email,
-      body.nationalities
+      body.nationalities,
+      body.username,
+      body.password
     );
 
     if (client) {

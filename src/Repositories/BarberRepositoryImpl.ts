@@ -1,11 +1,6 @@
 import { Injectable } from "nestjs-injectable";
 import { InjectRepository } from "@nestjs/typeorm";
-import {
-  Repository,
-  SelectQueryBuilder,
-  UpdateResult,
-  getManager,
-} from "typeorm";
+import { Repository, UpdateResult, getManager } from "typeorm";
 import { Barber } from "src/Entities/Barber";
 import { UserRepository } from "./UserRepository";
 
@@ -26,7 +21,7 @@ export class BarberRepositoryImpl implements UserRepository {
   async findById(id: string): Promise<Barber> {
     return this.barberRepository
       .createQueryBuilder("barber")
-      .select(["barber.id", "barber.lastName", "barber.firstName"])
+      .select("barber")
       .where("barber.id = :id", {
         id,
       })
@@ -34,30 +29,38 @@ export class BarberRepositoryImpl implements UserRepository {
   }
 
   async createOrUpdate(barber: Barber): Promise<Barber> {
-    await this.barberRepository
-      .createQueryBuilder()
-      .insert()
-      .into(Barber)
-      .values([
-        {
-          id: barber.id,
-          firstName: barber.firstName,
-          lastName: barber.lastName,
-          age: barber.age,
-          email: barber.email,
-          experience: barber.experience,
-          nationalities: barber.nationalities,
-          address: barber.address,
-        },
-      ])
-      .orUpdate({
-        conflict_target: ["id"],
-        overwrite: ["firstName", "lastName"],
-      })
-      .execute();
-
+    await this.barberRepository.save(barber);
     return this.findById(barber.id);
   }
+
+  // async createOrUpdate(barber: Barber): Promise<Barber> {
+  //   await this.barberRepository
+  //     .createQueryBuilder()
+  //     .insert()
+  //     .into(Barber)
+  //     .values([
+  //       {
+  //         id: barber.id,
+  //         firstName: barber.firstName,
+  //         lastName: barber.lastName,
+  //         age: barber.age,
+  //         email: barber.email,
+  //         experience: barber.experience,
+  //         nationalities: barber.nationalities,
+  //         address: barber.address,
+  //         username: barber.username,
+  //         password: barber.password,
+  //         year: barber.year,
+  //       },
+  //     ])
+  //     .orUpdate({
+  //       conflict_target: ["id"],
+  //       overwrite: ["firstName", "lastName"],
+  //     })
+  //     .execute();
+
+  //   return this.findById(barber.id);
+  // }
 
   async update(id: string, barber: Barber): Promise<Barber> {
     this.barberRepository

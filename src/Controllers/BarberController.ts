@@ -50,6 +50,8 @@ export class BarberController {
       body.postalCode,
       body.experience,
       body.email,
+      body.username,
+      body.password,
       body.addressName
     );
   }

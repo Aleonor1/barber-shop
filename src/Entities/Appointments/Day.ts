@@ -1,0 +1,29 @@
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from "typeorm";
+import { Appointment } from "./Appointment";
+import { Month } from "./Month";
+
+@Entity()
+export class Day {
+  @PrimaryColumn()
+  dayNumber: number;
+
+  @OneToMany(() => Appointment, (appointment) => appointment.day, {
+    cascade: ["insert", "update"],
+  })
+  public appointments: Appointment[];
+
+  @ManyToOne(() => Month, (month) => month.days)
+  month: Month;
+
+  constructor(appointments: Appointment[], dayNumber: number) {
+    this.appointments = appointments;
+    this.dayNumber = dayNumber;
+  }
+}

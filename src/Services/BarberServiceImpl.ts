@@ -9,6 +9,11 @@ import { UpdateResult } from "typeorm";
 import { BarberBuilderImpl } from "src/Builder/BarberBuilderImpl";
 import { CountryRepositoryImpl } from "src/Repositories/CountryRepositoryImpl";
 import { Country } from "src/Entities/Country";
+import { Appointment } from "src/Entities/Appointments/Appointment";
+import { Day } from "src/Entities/Appointments/Day";
+import { Month } from "src/Entities/Appointments/Month";
+import { Year } from "src/Entities/Appointments/Year";
+import { BarberService } from "src/Entities/BarberService";
 
 Injectable();
 export class BarberServiceImpl {
@@ -36,6 +41,8 @@ export class BarberServiceImpl {
     postalCode: string,
     experience: ExperienceLevel,
     email: string,
+    username: string,
+    password: string,
     addressName?: string,
     id?: string
   ): Promise<Barber> {
@@ -49,9 +56,11 @@ export class BarberServiceImpl {
 
     let countriesFromDb: Country[];
 
-    nationalities.map(
+    nationalities.forEach(
       async (coun) => await this.countryRepositoryImpl.findById(coun)
     );
+
+    const year = this.handleAppointments();
 
     const newBarber = new BarberBuilderImpl()
       .setLastName(lastName)
@@ -61,8 +70,35 @@ export class BarberServiceImpl {
       .setExperience(experience)
       .setNationalities(countriesFromDb)
       .setEmail(email)
+      .setUsername(username)
+      .setPassword(password)
+      .setYear(year)
       .build();
     return await this.barberRepository.createOrUpdate(newBarber);
+  }
+
+  private handleAppointments(): Year {
+    let appointments: Appointment[] = new Array<Appointment>();
+    let months: Month[] = new Array<Month>();
+
+    for (let hour = 8; hour < 17; hour++) {
+      appointments.push(new Appointment(`${hour}:00`, `${hour + 1}:00`));
+    }
+
+    for (let month = 1; month < 13; month++) {
+      const daysInMonth = this.daysInMonth(month, new Date().getFullYear());
+      let currentMonthDays = new Array<Day>();
+      for (let day = 1; day <= daysInMonth; day++) {
+        currentMonthDays.push(new Day(appointments, day));
+      }
+      months.push(new Month(currentMonthDays, month));
+    }
+
+    return new Year(months);
+  }
+
+  private daysInMonth(month: number, year: number) {
+    return new Date(year, month, 0).getDate();
   }
 
   async getAllBarbers(): Promise<[Barber[], number]> {
@@ -79,5 +115,18 @@ export class BarberServiceImpl {
 
   async restoreSoftDelete(id: string): Promise<UpdateResult> {
     return await this.barberRepository.restoreSoftDelete(id);
+  }
+
+  async addAppointment(
+    barberId: string,
+    day: number,
+    month: number,
+    from: string,
+    to: string,
+    service: BarberService,
+    clientId: string
+  ) {
+    const barber = await this.getBarberById(barberId);
+    barber.setAppointment(month, day, from);
   }
 }

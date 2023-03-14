@@ -1,5 +1,6 @@
 import {
   IsArray,
+  IsEmail,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -41,7 +42,16 @@ export class BarberDto {
 
   @IsString()
   @IsNotEmpty()
+  @IsEmail()
   public email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  public username: string;
+
+  @IsString()
+  @IsNotEmpty()
+  public password: string;
 
   @IsString()
   @IsNotEmpty()

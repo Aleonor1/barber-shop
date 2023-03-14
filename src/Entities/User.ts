@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import { BasicAddress } from "src/Utils/Address";
 import { Country } from "./Country";
+import { use } from "passport";
 
 @Entity()
 export class User {
@@ -27,6 +28,12 @@ export class User {
   @JoinColumn()
   nationalities: Country[];
 
+  @Column()
+  username: string;
+
+  @Column()
+  password: string;
+
   @OneToOne(() => BasicAddress)
   @JoinColumn()
   address: BasicAddress;
@@ -37,7 +44,9 @@ export class User {
     age: number,
     nationalities: Country[],
     address: BasicAddress,
-    email: string
+    email: string,
+    username: string,
+    password: string
   ) {
     this.firstName = firstName;
     this.lastName = lastName;
@@ -45,6 +54,8 @@ export class User {
     this.nationalities = nationalities;
     this.address = address;
     this.email = email;
+    this.username = username;
+    this.password = password;
   }
 
   @DeleteDateColumn()

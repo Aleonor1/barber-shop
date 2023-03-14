@@ -18,6 +18,14 @@ export class CleintDto {
   @IsNotEmpty()
   public lastName: string;
 
+  @IsString()
+  @IsNotEmpty()
+  public username: string;
+
+  @IsString()
+  @IsNotEmpty()
+  public password: string;
+
   @IsNumber()
   @IsNotEmpty()
   public age: number;
@@ -40,10 +48,6 @@ export class CleintDto {
 
   @IsString()
   @IsNotEmpty()
-  public fidelity: number;
-
-  @IsString()
-  @IsNotEmpty()
   public addressName: string;
 
   @IsString()
@@ -51,7 +55,6 @@ export class CleintDto {
   public email: string;
 
   @IsDefined()
-  @IsNotEmptyObject()
   @Type(() => Country)
   public nationalities: Country[];
 }

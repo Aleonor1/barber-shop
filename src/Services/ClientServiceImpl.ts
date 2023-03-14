@@ -1,11 +1,8 @@
 import { HttpStatus, Inject, Injectable } from "@nestjs/common";
 import { ClientRepositoryImpl } from "src/Repositories/ClientRepositoryImpl";
-import { ExperienceLevel } from "src/Utils/ExperienceLevel";
 import { Client } from "src/Entities/Client";
 import { BasicAddressRepository } from "src/Repositories/BasicAddressRepository";
 import { Country } from "src/Entities/Country";
-import { UpdateResult } from "typeorm";
-import { emitWarning } from "process";
 import { ClientBuilderImpl } from "src/Builder/ClientBuilderImpl";
 import { statusEnum } from "src/EmailConfirmation/Status";
 import { MailSenderService } from "src/EmailConfirmation/MailSenderService";
@@ -29,7 +26,9 @@ export class ClientsService {
     postalCode: string,
     addressName: string,
     email: string,
-    nationalities: Country[]
+    nationalities: Country[],
+    username: string,
+    password: string
   ): Promise<Client> {
     let address = await this.basicAddressRepository.handleAddress(
       addressName,
@@ -50,6 +49,8 @@ export class ClientsService {
       .setNationalities(nationalities)
       .setFidelityLevel(0)
       .setToken(verifyToken)
+      .setUsername(username)
+      .setPassword(password)
       .build();
 
     const dbClient = await this.clientRepositoryImpl.createOrUpdate(newClient);
@@ -72,7 +73,7 @@ export class ClientsService {
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     const charLength = chars.length;
     let result = "";
-    for (var i = 0; i < 30; i++) {
+    for (let i = 0; i < 30; i++) {
       result += chars.charAt(Math.floor(Math.random() * charLength));
     }
     return result;
@@ -83,7 +84,7 @@ export class ClientsService {
 
     if (client && client.token === token) {
       client.status = statusEnum.active;
-      client = await this.clientRepositoryImpl.verifyUser(client);
+      await this.clientRepositoryImpl.verifyUser(client);
     }
 
     return this.findOne(id);

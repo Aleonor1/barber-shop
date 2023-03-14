@@ -93,6 +93,8 @@ export class ClientRepositoryImpl implements UserRepository {
           address: client.address,
           status: client.status,
           token: client.token,
+          username: client.username,
+          password: client.password,
         },
       ])
       .orUpdate({
