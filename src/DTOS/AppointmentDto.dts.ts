@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsNumber, IsString, isString } from "class-validator";
-import { BarberService } from "src/Entities/BarberService";
+import { HairdresserService } from "src/Entities/HairdresserService";
 
 export class AppointmentDto {
   @IsNotEmpty()
@@ -23,7 +23,8 @@ export class AppointmentDto {
   barberId: string;
 
   @IsNotEmpty()
-  service: BarberService;
+  @IsString()
+  service: string;
 
   @IsNotEmpty()
   @IsNumber()

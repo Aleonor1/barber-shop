@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToMany,
   ManyToOne,
   OneToOne,
@@ -8,7 +9,7 @@ import {
 } from "typeorm";
 import { Client } from "../Client";
 import { Day } from "./Day";
-import { BarberService } from "../BarberService";
+import { HairdresserService } from "../HairdresserService";
 
 @Entity()
 export class Appointment {
@@ -25,10 +26,14 @@ export class Appointment {
   booked: boolean;
 
   @OneToOne(() => Client)
+  @JoinColumn()
   client: Client;
 
-  @OneToOne(() => BarberService)
-  service: BarberService;
+  @OneToOne(() => HairdresserService, {
+    cascade: ["insert", "update"],
+  })
+  @JoinColumn()
+  service: HairdresserService;
 
   @ManyToOne(() => Day, (day) => day.appointments)
   day: Day;
@@ -36,5 +41,17 @@ export class Appointment {
   constructor(from: string, to: string) {
     this.from = from;
     this.to = to;
+  }
+
+  public setService(service: HairdresserService): void {
+    this.service = service;
+  }
+
+  public setClient(client: Client): void {
+    this.client = client;
+  }
+
+  public setBooked(booked: boolean): void {
+    this.booked = booked;
   }
 }

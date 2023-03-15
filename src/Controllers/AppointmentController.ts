@@ -11,8 +11,8 @@ export class AppointmentController {
   ) {}
 
   @Post("/")
-  insertBarber(@Body() body: AppointmentDto): void {
-    this.appointmentService.create(
+  async insertBarber(@Body() body: AppointmentDto): Promise<void> {
+    await this.appointmentService.create(
       body.from,
       body.to,
       body.month,

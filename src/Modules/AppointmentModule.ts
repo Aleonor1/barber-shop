@@ -12,6 +12,11 @@ import { AppointmentController } from "src/Controllers/AppointmentController";
 import { ClientsService } from "src/Services/ClientServiceImpl";
 import { AppointmentServiceImpl } from "src/Services/AppointmentServiceImpl";
 import { Appointment } from "src/Entities/Appointments/Appointment";
+import { ClientRepositoryImpl } from "src/Repositories/ClientRepositoryImpl";
+import { Client } from "src/Entities/Client";
+import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
+import { HairdresserServicesRepositoryImpl } from "src/Repositories/HairdresserServicesRepositoryImpl";
+import { HairdresserService } from "src/Entities/HairdresserService";
 
 @Module({
   imports: [
@@ -19,6 +24,8 @@ import { Appointment } from "src/Entities/Appointments/Appointment";
     TypeOrmModule.forFeature([Barber]),
     TypeOrmModule.forFeature([BasicAddress]),
     TypeOrmModule.forFeature([Country]),
+    TypeOrmModule.forFeature([Client]),
+    TypeOrmModule.forFeature([HairdresserService]),
   ],
   controllers: [AppointmentController],
   providers: [
@@ -26,7 +33,11 @@ import { Appointment } from "src/Entities/Appointments/Appointment";
     BarberServiceImpl,
     BarberRepositoryImpl,
     BasicAddressRepository,
+    ClientsService,
+    ClientRepositoryImpl,
     CountryRepositoryImpl,
+    AppointmentRepositoryImpl,
+    HairdresserServicesRepositoryImpl,
   ],
 })
 export class AppointmentModule {}

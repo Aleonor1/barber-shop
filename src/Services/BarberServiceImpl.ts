@@ -13,7 +13,12 @@ import { Appointment } from "src/Entities/Appointments/Appointment";
 import { Day } from "src/Entities/Appointments/Day";
 import { Month } from "src/Entities/Appointments/Month";
 import { Year } from "src/Entities/Appointments/Year";
-import { BarberService } from "src/Entities/BarberService";
+import { HairdresserService } from "src/Entities/HairdresserService";
+import { ClientsService } from "./ClientServiceImpl";
+import { Client } from "src/Entities/Client";
+import { ClientSessionRequestOptions } from "http2";
+import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
+import { HairdresserServicesRepositoryImpl } from "src/Repositories/HairdresserServicesRepositoryImpl";
 
 Injectable();
 export class BarberServiceImpl {
@@ -23,7 +28,13 @@ export class BarberServiceImpl {
     @Inject(BasicAddressRepository)
     private readonly basicAddressRepository: BasicAddressRepository,
     @Inject(CountryRepositoryImpl)
-    private readonly countryRepositoryImpl: CountryRepositoryImpl
+    private readonly countryRepositoryImpl: CountryRepositoryImpl,
+    @Inject(ClientsService)
+    private readonly clientService: ClientsService,
+    @Inject(AppointmentRepositoryImpl)
+    private readonly appointmentRepository: AppointmentRepositoryImpl,
+    @Inject(HairdresserServicesRepositoryImpl)
+    private readonly hairdresserServicesRepositoryImpl: HairdresserServicesRepositoryImpl
   ) {}
 
   public async getBarberById(id: string): Promise<Barber> {
@@ -81,14 +92,14 @@ export class BarberServiceImpl {
     let appointments: Appointment[] = new Array<Appointment>();
     let months: Month[] = new Array<Month>();
 
-    for (let hour = 8; hour < 17; hour++) {
-      appointments.push(new Appointment(`${hour}:00`, `${hour + 1}:00`));
-    }
-
     for (let month = 1; month < 13; month++) {
       const daysInMonth = this.daysInMonth(month, new Date().getFullYear());
       let currentMonthDays = new Array<Day>();
       for (let day = 1; day <= daysInMonth; day++) {
+        appointments = new Array<Appointment>();
+        for (let hour = 8; hour < 17; hour++) {
+          appointments.push(new Appointment(`${hour}:00`, `${hour + 1}:00`));
+        }
         currentMonthDays.push(new Day(appointments, day));
       }
       months.push(new Month(currentMonthDays, month));
@@ -123,10 +134,26 @@ export class BarberServiceImpl {
     month: number,
     from: string,
     to: string,
-    service: BarberService,
+    service: string,
     clientId: string
-  ) {
+  ): Promise<Appointment> {
     const barber = await this.getBarberById(barberId);
-    barber.setAppointment(month, day, from);
+    const client = await this.clientService.findOne(clientId);
+
+    let appointment = null;
+    if (client && barber) {
+      appointment = barber.getAppointment(month, day, from, to);
+      if (!appointment.booked) {
+        const hairDresserService =
+          await this.hairdresserServicesRepositoryImpl.findById(service);
+        if (hairDresserService) {
+          appointment.setService(hairDresserService);
+          appointment.setClient(client);
+          appointment.setBooked(true);
+          await this.appointmentRepository.createOrUpdate(appointment);
+        }
+      }
+    }
+    return appointment;
   }
 }

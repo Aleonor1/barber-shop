@@ -1,0 +1,9 @@
+[
+  { "code": "DIRECTORS_CUT", "string": "Directors cut", "price": 15 },
+  { "code": "CUT_WITH_SCISSORS", "string": "Cut with scissors", "price": 20 },
+  { "code": "BEARD_COLOR", "string": "Beard color", "price": 20 },
+  { "code": "HOT_TOWEL_SHAVE", "string": "Hot towel shave", "price": 20 },
+  { "code": "STYLING", "string": "Styling", "price": 20 },
+  { "code": "CAPILLARY_MASSAGE", "string": "Capillary massage", "price": 20 },
+  { "code": "EXTRA_WASH", "string": "Extra Wash", "price": 20 }
+]

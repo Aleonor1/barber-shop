@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository, UpdateResult, getManager } from "typeorm";
 import { Barber } from "src/Entities/Barber";
 import { UserRepository } from "./UserRepository";
+import { Year } from "src/Entities/Appointments/Year";
 
 @Injectable()
 export class BarberRepositoryImpl implements UserRepository {
@@ -19,13 +20,20 @@ export class BarberRepositoryImpl implements UserRepository {
   }
 
   async findById(id: string): Promise<Barber> {
-    return this.barberRepository
-      .createQueryBuilder("barber")
-      .select("barber")
-      .where("barber.id = :id", {
-        id,
-      })
-      .getOne();
+    return (
+      this.barberRepository
+        .createQueryBuilder("barber")
+        .leftJoinAndSelect("barber.year", "year")
+        .leftJoinAndSelect("year.months", "months")
+        .leftJoinAndSelect("months.days", "days")
+        .leftJoinAndSelect("days.appointments", "appointments")
+        .leftJoinAndSelect("appointments.service", "service")
+        // .leftJoinAndSelect("appointments.client", "client")
+        .where("barber.id = :id", {
+          id,
+        })
+        .getOne()
+    );
   }
 
   async createOrUpdate(barber: Barber): Promise<Barber> {

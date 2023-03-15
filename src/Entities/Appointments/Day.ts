@@ -11,7 +11,10 @@ import { Month } from "./Month";
 
 @Entity()
 export class Day {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
   dayNumber: number;
 
   @OneToMany(() => Appointment, (appointment) => appointment.day, {

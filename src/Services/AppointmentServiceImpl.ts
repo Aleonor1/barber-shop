@@ -3,25 +3,28 @@ import { BarberRepositoryImpl } from "src/Repositories/BarberRepositoryImpl";
 import { BarberServiceImpl } from "./BarberServiceImpl";
 import { ClientsService } from "./ClientServiceImpl";
 import { ClientSession } from "typeorm";
-import { BarberService } from "src/Entities/BarberService";
+import { HairdresserService } from "src/Entities/HairdresserService";
 import { Appointment } from "src/Entities/Appointments/Appointment";
+import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
 
 export class AppointmentServiceImpl {
   constructor(
     @Inject(BarberServiceImpl)
-    private readonly barberService: BarberServiceImpl
+    private readonly barberService: BarberServiceImpl,
+    @Inject(AppointmentRepositoryImpl)
+    private readonly appointmentRepository: AppointmentRepositoryImpl
   ) {}
 
-  public create(
+  public async create(
     from: string,
     to: string,
     month: number,
     clientId: string,
     barberId: string,
-    service: BarberService,
+    service: string,
     day: number
-  ): void {
-    this.barberService.addAppointment(
+  ): Promise<void> {
+    const appointment = await this.barberService.addAppointment(
       barberId,
       day,
       month,
@@ -30,5 +33,7 @@ export class AppointmentServiceImpl {
       service,
       clientId
     );
+
+    await this.appointmentRepository.createOrUpdate(appointment);
   }
 }

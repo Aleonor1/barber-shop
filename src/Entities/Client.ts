@@ -3,6 +3,7 @@ import { User } from "./User";
 import { BasicAddress } from "src/Utils/Address";
 import { Country } from "./Country";
 import { statusEnum } from "src/EmailConfirmation/Status";
+import { Appointment } from "./Appointments/Appointment";
 
 @Entity()
 export class Client extends User {

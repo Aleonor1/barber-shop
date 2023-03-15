@@ -11,13 +11,16 @@ import { Year } from "./Year";
 
 @Entity()
 export class Month {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
   monthNumber: number;
 
   @OneToMany(() => Day, (day) => day.month, { cascade: ["insert", "update"] })
   days: Day[];
 
-  @ManyToOne(() => Year, (year) => year.months)
+  @ManyToOne(() => Year, (year) => year.id)
   year: Year;
 
   constructor(days: Day[], monthNumber: number) {

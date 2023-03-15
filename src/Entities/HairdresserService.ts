@@ -1,7 +1,7 @@
 import { Column, Double, Entity, PrimaryColumn } from "typeorm";
 
-@Entity()
-export class BarberService {
+@Entity("hairdresser_service")
+export class HairdresserService {
   @PrimaryColumn()
   code: string;
 

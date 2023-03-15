@@ -16,14 +16,15 @@ import { Calendar } from "./Entities/Appointments/Calendar";
 import { Day } from "./Entities/Appointments/Day";
 import { Month } from "./Entities/Appointments/Month";
 import { Year } from "./Entities/Appointments/Year";
-import { BarberService } from "./Entities/BarberService";
 import { AppointmentModule } from "./Modules/AppointmentModule";
+import { HairdresserService } from "./Entities/HairdresserService";
+import { HairdresserServicesRepositoryImpl } from "./Repositories/HairdresserServicesRepositoryImpl";
 
 @Module({
   imports: [
     BarberModule,
     AppointmentModule,
-    TypeOrmModule.forFeature([Country]),
+    TypeOrmModule.forFeature([Country, HairdresserService]),
     TypeOrmModule.forRoot({
       type: "postgres",
       host: "localhost",
@@ -40,7 +41,7 @@ import { AppointmentModule } from "./Modules/AppointmentModule";
         Appointment,
         Day,
         Month,
-        BarberService,
+        HairdresserService,
         Year,
       ],
       synchronize: true,
@@ -50,6 +51,10 @@ import { AppointmentModule } from "./Modules/AppointmentModule";
     CountryModule,
   ],
   controllers: [AppController],
-  providers: [AppService, CountryRepositoryImpl],
+  providers: [
+    AppService,
+    CountryRepositoryImpl,
+    HairdresserServicesRepositoryImpl,
+  ],
 })
 export class AppModule {}
