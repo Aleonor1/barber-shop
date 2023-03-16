@@ -1,6 +1,6 @@
 import { Column, Double, Entity, PrimaryColumn } from "typeorm";
 
-@Entity("hairdresser_service")
+@Entity()
 export class HairdresserService {
   @PrimaryColumn()
   code: string;

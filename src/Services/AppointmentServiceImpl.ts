@@ -6,6 +6,7 @@ import { ClientSession } from "typeorm";
 import { HairdresserService } from "src/Entities/HairdresserService";
 import { Appointment } from "src/Entities/Appointments/Appointment";
 import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
+import { ClientNotFoundError } from "src/Utils/CustomErrors/ClientNotFoundError";
 
 export class AppointmentServiceImpl {
   constructor(
@@ -33,7 +34,6 @@ export class AppointmentServiceImpl {
       service,
       clientId
     );
-
     await this.appointmentRepository.createOrUpdate(appointment);
   }
 }

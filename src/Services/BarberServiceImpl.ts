@@ -19,6 +19,9 @@ import { Client } from "src/Entities/Client";
 import { ClientSessionRequestOptions } from "http2";
 import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
 import { HairdresserServicesRepositoryImpl } from "src/Repositories/HairdresserServicesRepositoryImpl";
+import { BarberNotFoundError } from "src/Utils/CustomErrors/BarberNotFoundError";
+import { ClientNotFoundError } from "src/Utils/CustomErrors/ClientNotFoundError";
+import countries from "../Utils/countries.json";
 
 Injectable();
 export class BarberServiceImpl {
@@ -65,11 +68,12 @@ export class BarberServiceImpl {
       postalCode
     );
 
-    let countriesFromDb: Country[];
+    let countriesFromDb: Country[] = new Array<Country>();
 
-    nationalities.forEach(
-      async (coun) => await this.countryRepositoryImpl.findById(coun)
-    );
+    // nationalities.forEach(async (coun) => {
+    //   const countryFromDb = await this.countryRepositoryImpl.findById(coun);
+    //   countriesFromDb.push(countryFromDb);
+    // });
 
     const year = this.handleAppointments();
 
@@ -85,6 +89,7 @@ export class BarberServiceImpl {
       .setPassword(password)
       .setYear(year)
       .build();
+
     return await this.barberRepository.createOrUpdate(newBarber);
   }
 
@@ -92,12 +97,12 @@ export class BarberServiceImpl {
     let appointments: Appointment[] = new Array<Appointment>();
     let months: Month[] = new Array<Month>();
 
-    for (let month = 1; month < 13; month++) {
+    for (let month = 1; month < 2; month++) {
       const daysInMonth = this.daysInMonth(month, new Date().getFullYear());
       let currentMonthDays = new Array<Day>();
-      for (let day = 1; day <= daysInMonth; day++) {
+      for (let day = 1; day <= 2; day++) {
         appointments = new Array<Appointment>();
-        for (let hour = 8; hour < 17; hour++) {
+        for (let hour = 8; hour < 10; hour++) {
           appointments.push(new Appointment(`${hour}:00`, `${hour + 1}:00`));
         }
         currentMonthDays.push(new Day(appointments, day));
@@ -140,18 +145,20 @@ export class BarberServiceImpl {
     const barber = await this.getBarberById(barberId);
     const client = await this.clientService.findOne(clientId);
 
-    let appointment = null;
-    if (client && barber) {
-      appointment = barber.getAppointment(month, day, from, to);
-      if (!appointment.booked) {
-        const hairDresserService =
-          await this.hairdresserServicesRepositoryImpl.findById(service);
-        if (hairDresserService) {
-          appointment.setService(hairDresserService);
-          appointment.setClient(client);
-          appointment.setBooked(true);
-          await this.appointmentRepository.createOrUpdate(appointment);
-        }
+    if (!barber) {
+      throw new BarberNotFoundError();
+    } else if (!client) {
+      throw new ClientNotFoundError();
+    }
+    let appointment = barber.getAppointment(month, day, from, to);
+    if (!appointment.booked) {
+      const hairDresserService =
+        await this.hairdresserServicesRepositoryImpl.findById(service);
+      if (hairDresserService) {
+        appointment.setService(hairDresserService);
+        appointment.setClient(client);
+        appointment.setBooked(true);
+        await this.appointmentRepository.createOrUpdate(appointment);
       }
     }
     return appointment;

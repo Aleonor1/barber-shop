@@ -10,6 +10,7 @@ import {
 import { Client } from "../Client";
 import { Day } from "./Day";
 import { HairdresserService } from "../HairdresserService";
+import { Barber } from "../Barber";
 
 @Entity()
 export class Appointment {
@@ -25,15 +26,23 @@ export class Appointment {
   @Column({ default: false })
   booked: boolean;
 
-  @OneToOne(() => Client)
+  @OneToOne(() => Client, { cascade: ["insert", "update"] })
   @JoinColumn()
   client: Client;
 
   @OneToOne(() => HairdresserService, {
+    onDelete: "RESTRICT",
+    onUpdate: "RESTRICT",
     cascade: ["insert", "update"],
   })
   @JoinColumn()
   service: HairdresserService;
+
+  @OneToOne(() => Barber, {
+    cascade: ["insert", "update"],
+  })
+  @JoinColumn()
+  barber: Barber;
 
   @ManyToOne(() => Day, (day) => day.appointments)
   day: Day;
