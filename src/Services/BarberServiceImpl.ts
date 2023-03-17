@@ -19,6 +19,8 @@ import { Client } from "src/Entities/Client";
 import { ClientSessionRequestOptions } from "http2";
 import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
 import { HairdresserServicesRepositoryImpl } from "src/Repositories/HairdresserServicesRepositoryImpl";
+import { BarberNotFoundError } from "src/Utils/CustomErrors.ts/BarberNotFoundError";
+import { ClientNotFoundError } from "src/Utils/CustomErrors.ts/ClientNotFoundError";
 
 Injectable();
 export class BarberServiceImpl {
@@ -139,19 +141,20 @@ export class BarberServiceImpl {
   ): Promise<Appointment> {
     const barber = await this.getBarberById(barberId);
     const client = await this.clientService.findOne(clientId);
-
-    let appointment = null;
-    if (client && barber) {
-      appointment = barber.getAppointment(month, day, from, to);
-      if (!appointment.booked) {
-        const hairDresserService =
-          await this.hairdresserServicesRepositoryImpl.findById(service);
-        if (hairDresserService) {
-          appointment.setService(hairDresserService);
-          appointment.setClient(client);
-          appointment.setBooked(true);
-          await this.appointmentRepository.createOrUpdate(appointment);
-        }
+    if (!barber) {
+      throw new BarberNotFoundError();
+    } else if (!client) {
+      throw new ClientNotFoundError();
+    }
+    let appointment = barber.getAppointment(month, day, from, to);
+    if (!appointment.booked) {
+      const hairDresserService =
+        await this.hairdresserServicesRepositoryImpl.findById(service);
+      if (hairDresserService) {
+        appointment.setService(hairDresserService);
+        appointment.setClient(client);
+        appointment.setBooked(true);
+        await this.appointmentRepository.createOrUpdate(appointment);
       }
     }
     return appointment;

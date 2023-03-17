@@ -20,25 +20,32 @@ export class BarberRepositoryImpl implements UserRepository {
   }
 
   async findById(id: string): Promise<Barber> {
-    return (
-      this.barberRepository
-        .createQueryBuilder("barber")
-        .leftJoinAndSelect("barber.year", "year")
-        .leftJoinAndSelect("year.months", "months")
-        .leftJoinAndSelect("months.days", "days")
-        .leftJoinAndSelect("days.appointments", "appointments")
-        .leftJoinAndSelect("appointments.service", "service")
-        // .leftJoinAndSelect("appointments.client", "client")
-        .where("barber.id = :id", {
-          id,
-        })
-        .getOne()
-    );
+    return this.barberRepository
+      .createQueryBuilder("barber")
+      .leftJoinAndSelect("barber.year", "year")
+      .leftJoinAndSelect("year.months", "months")
+      .leftJoinAndSelect("months.days", "days")
+      .leftJoinAndSelect("days.appointments", "appointments")
+      .leftJoinAndSelect("appointments.service", "service")
+      .leftJoinAndSelect("appointments.client", "client")
+      .where("barber.id = :id", {
+        id,
+      })
+      .getOne();
   }
 
   async createOrUpdate(barber: Barber): Promise<Barber> {
     await this.barberRepository.save(barber);
-    return this.findById(barber.id);
+    return await this.findById(barber.id);
+  }
+
+  async findByGeneric(field: string, value: string): Promise<Barber> {
+    return this.barberRepository
+      .createQueryBuilder("barber")
+      .where(`barber.${field} = :value`, {
+        value,
+      })
+      .getOne();
   }
 
   // async createOrUpdate(barber: Barber): Promise<Barber> {
