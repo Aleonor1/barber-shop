@@ -17,6 +17,18 @@ export class AppointmentRepositoryImpl {
       .getManyAndCount();
   }
 
+  async getAllBarberAppointmentsOnDay(
+    day: number
+  ): Promise<[Appointment[], number]> {
+    return this.appointmentRepository
+      .createQueryBuilder("appointment")
+      .select("appointment")
+      .where("appointment.day = :day", {
+        day,
+      })
+      .getManyAndCount();
+  }
+
   async createOrUpdate(appointment: Appointment): Promise<void> {
     await this.appointmentRepository.save(appointment);
   }
