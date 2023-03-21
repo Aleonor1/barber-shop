@@ -10,11 +10,34 @@ export class AppointmentRepositoryImpl {
     private readonly appointmentRepository: Repository<Appointment>
   ) {}
 
+  async getAllBarberAppointments(
+    barberId: string
+  ): Promise<[Appointment[], number]> {
+    return this.appointmentRepository
+      .createQueryBuilder("appointment")
+      .select("appointment")
+      .leftJoinAndSelect("appointment.barber", "barber")
+      .where("barber.id = :barberId", {
+        barberId,
+      })
+      .getManyAndCount();
+  }
+
   async getAllAppointments(): Promise<[Appointment[], number]> {
     return this.appointmentRepository
       .createQueryBuilder("appointment")
       .select("appointment")
       .getManyAndCount();
+  }
+
+  async getAppointmentById(appointmentId: string): Promise<Appointment> {
+    return this.appointmentRepository
+      .createQueryBuilder("appointment")
+      .select("appointment")
+      .where("appointment.id = :id", {
+        appointmentId,
+      })
+      .getOne();
   }
 
   async getAllBarberAppointmentsOnDay(

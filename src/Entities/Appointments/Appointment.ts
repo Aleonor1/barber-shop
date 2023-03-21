@@ -47,6 +47,13 @@ export class Appointment {
   @ManyToOne(() => Day, (day) => day.appointments)
   day: Day;
 
+  @Column({ default: false })
+  isConfirmed: Boolean;
+
+  confirm() {
+    this.isConfirmed = true;
+  }
+
   constructor(from: string, to: string) {
     this.from = from;
     this.to = to;
@@ -58,6 +65,10 @@ export class Appointment {
 
   public setClient(client: Client): void {
     this.client = client;
+  }
+
+  public setBarber(client: Barber): void {
+    this.barber = this.barber;
   }
 
   public setBooked(booked: boolean): void {

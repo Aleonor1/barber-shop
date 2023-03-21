@@ -19,8 +19,10 @@ import { Client } from "src/Entities/Client";
 import { ClientSessionRequestOptions } from "http2";
 import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
 import { HairdresserServicesRepositoryImpl } from "src/Repositories/HairdresserServicesRepositoryImpl";
-import { BarberNotFoundError } from "src/Utils/CustomErrors.ts/BarberNotFoundError";
-import { ClientNotFoundError } from "src/Utils/CustomErrors.ts/ClientNotFoundError";
+import { BarberNotFoundError } from "src/Utils/CustomErrors/BarberNotFoundError";
+import { ClientNotFoundError } from "src/Utils/CustomErrors/ClientNotFoundError";
+import { MailSenderService } from "src/EmailConfirmation/MailSenderService";
+import { AppointmentNotFoundError } from "src/Utils/CustomErrors/AppointmentNotFoundError";
 
 Injectable();
 export class BarberServiceImpl {
@@ -122,12 +124,41 @@ export class BarberServiceImpl {
     return this.barberRepository.update(id, newBarber);
   }
 
-  async deleteBarber(id: string): Promise<UpdateResult> {
-    return await this.barberRepository.delete(id);
+  async deleteBarber(id: string): Promise<Barber> {
+    const barber = await this.barberRepository.delete(id);
+    if (!barber) {
+      throw new BarberNotFoundError();
+    }
+
+    return barber;
   }
 
-  async restoreSoftDelete(id: string): Promise<UpdateResult> {
-    return await this.barberRepository.restoreSoftDelete(id);
+  async restoreSoftDelete(id: string): Promise<Barber> {
+    const barber = await this.barberRepository.restoreSoftDelete(id);
+    if (!barber) {
+      throw new BarberNotFoundError();
+    }
+    return barber;
+  }
+
+  async verifyAppointment(
+    barberId: string,
+    appointmentId: string
+  ): Promise<Appointment> {
+    let appointment = undefined;
+    const barber = this.barberRepository.findById(barberId);
+    if (!barber) {
+      throw new BarberNotFoundError();
+    }
+    appointment = await this.appointmentRepository.getAppointmentById(
+      appointmentId
+    );
+    if (!appointment) {
+      throw new AppointmentNotFoundError();
+    }
+    appointment.confirm();
+    this.appointmentRepository.createOrUpdate(appointment);
+    return appointment;
   }
 
   async addAppointment(
@@ -139,8 +170,10 @@ export class BarberServiceImpl {
     service: string,
     clientId: string
   ): Promise<Appointment> {
-    const barber = await this.getBarberById(barberId);
-    const client = await this.clientService.findOne(clientId);
+    const { barber, client } = await this.getBarberAndClient(
+      barberId,
+      clientId
+    );
     if (!barber) {
       throw new BarberNotFoundError();
     } else if (!client) {
@@ -154,9 +187,40 @@ export class BarberServiceImpl {
         appointment.setService(hairDresserService);
         appointment.setClient(client);
         appointment.setBooked(true);
+        appointment.setBarber(barber);
         await this.appointmentRepository.createOrUpdate(appointment);
       }
     }
+
+    const mailSender = MailSenderService.getInstance();
+    await mailSender.sendMailAppointmentToBarber(
+      "aleonornyikita@gmail.com",
+      "aleonornyikita@gmail.com",
+      appointment,
+      barber.id
+    );
     return appointment;
+  }
+
+  private async getBarberAndClient(barberId: string, clientId: string) {
+    const barber = await this.getBarberById(barberId);
+    if (!barber) {
+      throw new BarberNotFoundError();
+    }
+    const client = await this.clientService.findOne(clientId);
+    if (!client) {
+      throw new ClientNotFoundError();
+    }
+    return { barber, client };
+  }
+
+  async getAllBarberAppointments(
+    barberId: string
+  ): Promise<[Appointment[], number]> {
+    const barber = await this.getBarberById(barberId);
+    if (!barber) {
+      throw new BarberNotFoundError();
+    }
+    return await this.appointmentRepository.getAllBarberAppointments(barberId);
   }
 }

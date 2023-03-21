@@ -4,6 +4,7 @@ import { Repository, UpdateResult, getManager } from "typeorm";
 import { Barber } from "src/Entities/Barber";
 import { UserRepository } from "./UserRepository";
 import { Year } from "src/Entities/Appointments/Year";
+import { Appointment } from "src/Entities/Appointments/Appointment";
 
 @Injectable()
 export class BarberRepositoryImpl implements UserRepository {
@@ -36,7 +37,7 @@ export class BarberRepositoryImpl implements UserRepository {
 
   async createOrUpdate(barber: Barber): Promise<Barber> {
     await this.barberRepository.save(barber);
-    return await this.findById(barber.id);
+    return await this.findByGeneric("email", barber.email);
   }
 
   async findByGeneric(field: string, value: string): Promise<Barber> {
@@ -94,19 +95,23 @@ export class BarberRepositoryImpl implements UserRepository {
     return this.findById(id);
   }
 
-  async delete(barberId: string): Promise<UpdateResult> {
-    return this.barberRepository
+  async delete(barberId: string): Promise<Barber> {
+    await this.barberRepository
       .createQueryBuilder("barber")
       .softDelete()
       .where("id = :id", { id: barberId })
       .execute();
+
+    return await this.findById(barberId);
   }
 
-  async restoreSoftDelete(barberId: string): Promise<UpdateResult> {
-    return this.barberRepository
+  async restoreSoftDelete(barberId: string): Promise<Barber> {
+    await this.barberRepository
       .createQueryBuilder()
       .restore()
       .where("id = :id", { id: barberId })
       .execute();
+
+    return await this.findById(barberId);
   }
 }

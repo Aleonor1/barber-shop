@@ -15,6 +15,12 @@ export class AppointmentServiceImpl {
     private readonly appointmentRepository: AppointmentRepositoryImpl
   ) {}
 
+  public async getAllBarberAppointments(barberId: string) {
+    // return await this.appointmentRepository.getAllBarberAppointmentsOnDay(
+    //   barberId
+    // );
+  }
+
   public async create(
     from: string,
     to: string,
@@ -23,7 +29,7 @@ export class AppointmentServiceImpl {
     barberId: string,
     service: string,
     day: number
-  ): Promise<void> {
+  ): Promise<Appointment> {
     const appointment = await this.barberService.addAppointment(
       barberId,
       day,
@@ -34,6 +40,6 @@ export class AppointmentServiceImpl {
       clientId
     );
 
-    await this.appointmentRepository.createOrUpdate(appointment);
+    return appointment;
   }
 }
