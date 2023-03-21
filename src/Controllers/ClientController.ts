@@ -24,25 +24,27 @@ export class ClientsController {
 
   @Post()
   create(@Body() body: CleintDto, @Res() response: Response) {
-    const client = this.clientsService.create(
-      body.firstName,
-      body.lastName,
-      body.age,
-      body.street,
-      body.city,
-      body.country,
-      body.postalCode,
-      body.addressName,
-      body.email,
-      body.nationalities,
-      body.username,
-      body.password
-    );
+    try {
+      const client = this.clientsService.create(
+        body.firstName,
+        body.lastName,
+        body.age,
+        body.street,
+        body.city,
+        body.country,
+        body.postalCode,
+        body.addressName,
+        body.email,
+        body.nationalities,
+        body.username,
+        body.password
+      );
 
-    if (client) {
-      response.status(HttpStatus.CREATED).json(client).send();
-    } else {
-      response.status(HttpStatus.BAD_REQUEST).json().send();
+      if (client) {
+        response.status(HttpStatus.CREATED).json(client).send();
+      }
+    } catch (exception) {
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
     }
   }
 
@@ -52,18 +54,25 @@ export class ClientsController {
   }
 
   @Get(":id")
-  findOne(@Param("id") id: string, @Res() response: Response) {
-    const client = this.clientsService.findOne(id);
+  async findOne(
+    @Param("id") id: string,
+    @Res() response: Response
+  ): Promise<Client> {
+    try {
+      const client = await this.clientsService.findOne(id);
 
-    if (client) {
-      response.status(HttpStatus.OK).json(client).send();
-    } else if (client === undefined) {
-      response.status(HttpStatus.NOT_FOUND).json().send();
-    } else {
-      response.status(HttpStatus.BAD_REQUEST).json().send();
+      if (client) {
+        response.status(HttpStatus.OK).json(client).send();
+        return client;
+      } else if (client === undefined) {
+        response.status(HttpStatus.NOT_FOUND).json().send();
+      }
+    } catch (exception) {
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
     }
   }
 
+  //TODO
   // @Patch(":id")
   // update(@Param("id") id: string, @Body() body: Body) {
   //   this.clientsService.update(id, body);
@@ -71,12 +80,16 @@ export class ClientsController {
 
   @Delete(":id")
   async remove(@Param("id") id: string, @Res() response: Response) {
-    const client = await this.clientsService.deleteBarber(id);
+    try {
+      const client = await this.clientsService.deleteBarber(id);
 
-    if (client.deletedAt) {
-      response.status(HttpStatus.OK).json().send();
-    } else if (!client) {
-      response.status(HttpStatus.NOT_FOUND).json().send();
+      if (client.deletedAt) {
+        response.status(HttpStatus.OK).json().send();
+      } else if (!client) {
+        response.status(HttpStatus.NOT_FOUND).json().send();
+      }
+    } catch (exception) {
+      response.status(HttpStatus.BAD_REQUEST).json(exception.messages).send();
     }
   }
 
@@ -86,14 +99,16 @@ export class ClientsController {
     @Param("token") token: string,
     @Param("userId") userId: string
   ) {
-    const client = await this.clientsService.verify(token, userId);
+    try {
+      const client = await this.clientsService.verify(token, userId);
 
-    if (client && client.status === statusEnum.active) {
-      response.status(HttpStatus.ACCEPTED).json().send();
-    } else if (!client) {
-      response.status(HttpStatus.NOT_FOUND).json().send();
-    } else {
-      response.status(HttpStatus.BAD_REQUEST).json().send();
+      if (client && client.status === statusEnum.active) {
+        response.status(HttpStatus.ACCEPTED).json().send();
+      } else if (!client) {
+        response.status(HttpStatus.NOT_FOUND).json().send();
+      }
+    } catch (exception) {
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
     }
   }
 
@@ -102,12 +117,16 @@ export class ClientsController {
     @Param("id") id: string,
     @Res() response: Response
   ): Promise<void> {
-    const client = await this.clientsService.restoreSoftDelete(id);
+    try {
+      const client = await this.clientsService.restoreSoftDelete(id);
 
-    if (client && !client.deletedAt) {
-      response.status(HttpStatus.ACCEPTED).json(client).send();
-    } else {
-      response.status(HttpStatus.BAD_REQUEST).json().send();
+      if (client && !client.deletedAt) {
+        response.status(HttpStatus.ACCEPTED).json(client).send();
+      } else if (!client) {
+        response.status(HttpStatus.NOT_FOUND).json().send();
+      }
+    } catch (exception) {
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
     }
   }
 }
