@@ -41,4 +41,14 @@ export class Client extends User {
     this.status = statusEnum.pending;
     this.token = token;
   }
+
+  public toString(): string {
+    return `Client: 
+    Last Name : ${this.lastName}
+    First Name: ${this.firstName}
+    Age: ${this.age}, 
+    Username: ${this.username}, 
+    Experience: ${this.fidelityLevel}, 
+    Nationalities: ${this.nationalities}`;
+  }
 }

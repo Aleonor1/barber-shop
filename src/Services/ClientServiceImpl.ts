@@ -6,6 +6,8 @@ import { Country } from "src/Entities/Country";
 import { ClientBuilderImpl } from "src/Builder/ClientBuilderImpl";
 import { statusEnum } from "src/EmailConfirmation/Status";
 import { MailSenderService } from "src/EmailConfirmation/MailSenderService";
+import { Appointment } from "src/Entities/Appointments/Appointment";
+import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
 
 @Injectable()
 export class ClientsService {
@@ -13,7 +15,9 @@ export class ClientsService {
     @Inject(ClientRepositoryImpl)
     private readonly clientRepositoryImpl: ClientRepositoryImpl,
     @Inject(BasicAddressRepository)
-    private readonly basicAddressRepository: BasicAddressRepository
+    private readonly basicAddressRepository: BasicAddressRepository,
+    @Inject(AppointmentRepositoryImpl)
+    private readonly appointmentRepository: AppointmentRepositoryImpl
   ) {}
 
   async create(
@@ -100,5 +104,9 @@ export class ClientsService {
 
   async restoreSoftDelete(id: string): Promise<Client> {
     return await this.clientRepositoryImpl.restoreSoftDelete(id);
+  }
+
+  async getAllClientAppointments(id: string): Promise<Appointment[]> {
+    return await this.appointmentRepository.getAllClientAppointmnts(id);
   }
 }

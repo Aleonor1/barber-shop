@@ -49,6 +49,37 @@ export class MailSenderService {
     });
   }
 
+  public async sendMailToClientAppointmentConfirmed(
+    mail: string,
+    email: string,
+    appointment: Appointment,
+    barberId: string
+  ): Promise<void> {
+    const transporter = nodemailer.createTransport({
+      host: "smtp.zoho.eu",
+      port: 465,
+      secure: true, // use SSL
+      auth: { user: "aleonorbarbershop@zohomail.eu", pass: "ParolaGrea1" },
+    });
+
+    const mailOptions = {
+      from: "aleonorbarbershop@zohomail.eu",
+      to: mail,
+      subject: "Email confirmation",
+      text: `Your Appointment ${JSON.stringify(
+        appointment
+      )}. Is now confirmed!`,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(info);
+      }
+    });
+  }
+
   public async sendMail(
     mail: string,
     token: string,

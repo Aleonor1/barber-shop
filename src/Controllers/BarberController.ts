@@ -15,7 +15,6 @@ import {
   Res,
 } from "@nestjs/common";
 import { Response, response } from "express";
-import { first } from "rxjs";
 import { BarberDto } from "src/DTOS/BarberDto.dts";
 import { Appointment } from "src/Entities/Appointments/Appointment";
 import { Barber } from "src/Entities/Barber";
@@ -55,10 +54,12 @@ export class BarberController {
       } else {
         response.status(HttpStatus.OK).json().send();
       }
-    } catch (exception) {}
+    } catch (exception) {
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
+    }
   }
 
-  @Get("verifyAppointment/:barberId/:appointmentId")
+  @Get("verifyAppointment/:barberId/:appointmnetId")
   async verifyAppointment(
     @Param("barberId") barberId: string,
     @Param("appointmnetId") appointmentId: string,
@@ -139,12 +140,38 @@ export class BarberController {
   }
 
   @Get("/:id/allAppointments")
-  getAllBarberAppointments(
-    @Param("barberId") barberId: string,
+  async getAllBarberAppointments(
+    @Param("id") id: string,
     @Res() response: Response
   ) {
-    const appointments = this.barberService.getAllBarberAppointments(barberId);
+    try {
+      const appointments = await this.barberService.getAllBarberAppointments(
+        id
+      );
 
-    response.status(HttpStatus.OK).json(appointments).send();
+      response.status(HttpStatus.OK).json(appointments).send();
+      return appointments;
+    } catch (exception) {
+      response.status(HttpStatus.OK).json(exception.message).send();
+    }
+  }
+
+  @Get("/:id/freeAppointmentsOnDay")
+  async getEmptyAppointmentsFromBarber(
+    @Param("id") id: string,
+    @Param("month") month: number,
+    @Param("day") day: number,
+    @Res() response: Response
+  ) {
+    try {
+      const appointments = await this.barberService.getBarberEmptyAppointments(
+        id
+      );
+
+      response.status(HttpStatus.OK).json(appointments).send();
+      return appointments;
+    } catch (exception) {
+      response.status(HttpStatus.OK).json(exception.message).send();
+    }
   }
 }

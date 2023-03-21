@@ -15,6 +15,7 @@ import { Appointment } from "src/Entities/Appointments/Appointment";
 import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
 import { HairdresserServicesRepositoryImpl } from "src/Repositories/HairdresserServicesRepositoryImpl";
 import { HairdresserService } from "src/Entities/HairdresserService";
+import { AppointmentModule } from "./AppointmentModule";
 
 @Module({
   imports: [

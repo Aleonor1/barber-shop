@@ -89,7 +89,7 @@ export class BarberServiceImpl {
       .setPassword(password)
       .setYear(year)
       .build();
-    return await this.barberRepository.createOrUpdate(newBarber);
+    return this.barberRepository.createOrUpdate(newBarber);
   }
 
   private handleAppointments(): Year {
@@ -156,7 +156,11 @@ export class BarberServiceImpl {
     if (!appointment) {
       throw new AppointmentNotFoundError();
     }
+    if (appointment && appointment.isConfirmed) {
+      throw new Error("Appointment is already confirmed");
+    }
     appointment.confirm();
+
     this.appointmentRepository.createOrUpdate(appointment);
     return appointment;
   }
@@ -180,18 +184,29 @@ export class BarberServiceImpl {
       throw new ClientNotFoundError();
     }
     let appointment = barber.getAppointment(month, day, from, to);
-    if (!appointment.booked) {
-      const hairDresserService =
-        await this.hairdresserServicesRepositoryImpl.findById(service);
-      if (hairDresserService) {
-        appointment.setService(hairDresserService);
-        appointment.setClient(client);
-        appointment.setBooked(true);
-        appointment.setBarber(barber);
-        await this.appointmentRepository.createOrUpdate(appointment);
-      }
+    if (appointment.booked) {
+      throw new Error("Appointment is already booked");
     }
 
+    const hairDresserService =
+      await this.hairdresserServicesRepositoryImpl.findById(service);
+    if (hairDresserService) {
+      appointment.setService(hairDresserService);
+      appointment.setClient(client);
+      appointment.setBooked(true);
+      // appointment.setBarber(barber);
+      await this.appointmentRepository.createOrUpdate(appointment);
+      // this.barberRepository.createOrUpdate(barber);
+    }
+
+    await this.sendEmailCreatedAppointment(appointment, barber);
+    return appointment;
+  }
+
+  private async sendEmailCreatedAppointment(
+    appointment: Appointment,
+    barber: Barber
+  ) {
     const mailSender = MailSenderService.getInstance();
     await mailSender.sendMailAppointmentToBarber(
       "aleonornyikita@gmail.com",
@@ -199,7 +214,6 @@ export class BarberServiceImpl {
       appointment,
       barber.id
     );
-    return appointment;
   }
 
   private async getBarberAndClient(barberId: string, clientId: string) {
@@ -214,13 +228,41 @@ export class BarberServiceImpl {
     return { barber, client };
   }
 
-  async getAllBarberAppointments(
-    barberId: string
-  ): Promise<[Appointment[], number]> {
-    const barber = await this.getBarberById(barberId);
+  async getAllBarberAppointments(barberId: string): Promise<Appointment[]> {
+    const barber = await this.barberRepository.getBarberWithAppointments(
+      barberId
+    );
+
     if (!barber) {
       throw new BarberNotFoundError();
     }
-    return await this.appointmentRepository.getAllBarberAppointments(barberId);
+
+    const appointments = barber.year.months.flatMap((month) => {
+      return month.days.flatMap((day) => {
+        return day.appointments.filter(
+          (appointment) => appointment.booked && appointment.isConfirmed
+        );
+      });
+    });
+
+    return appointments;
+  }
+
+  async getBarberEmptyAppointments(barberId: string): Promise<Appointment[]> {
+    const barber = await this.barberRepository.getBarberWithAppointments(
+      barberId
+    );
+
+    if (!barber) {
+      throw new BarberNotFoundError();
+    }
+
+    const appointments = barber.year.months.flatMap((month) => {
+      return month.days.flatMap((day) => {
+        return day.appointments.filter((appointment) => !appointment.booked);
+      });
+    });
+
+    return appointments;
   }
 }

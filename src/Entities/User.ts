@@ -11,7 +11,7 @@ import { Country } from "./Country";
 import { use } from "passport";
 
 @Entity()
-export class User {
+export abstract class User {
   @PrimaryGeneratedColumn()
   id: string;
 
@@ -63,4 +63,6 @@ export class User {
 
   @Column({ unique: true })
   email: string;
+
+  abstract toString(): string;
 }

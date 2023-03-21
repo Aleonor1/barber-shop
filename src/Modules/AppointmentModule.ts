@@ -29,6 +29,7 @@ import { HairdresserService } from "src/Entities/HairdresserService";
   ],
   controllers: [AppointmentController],
   providers: [
+    AppointmentRepositoryImpl,
     AppointmentServiceImpl,
     BarberServiceImpl,
     BarberRepositoryImpl,
@@ -36,7 +37,6 @@ import { HairdresserService } from "src/Entities/HairdresserService";
     ClientsService,
     ClientRepositoryImpl,
     CountryRepositoryImpl,
-    AppointmentRepositoryImpl,
     HairdresserServicesRepositoryImpl,
   ],
 })

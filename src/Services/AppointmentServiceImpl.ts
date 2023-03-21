@@ -6,19 +6,18 @@ import { ClientSession } from "typeorm";
 import { HairdresserService } from "src/Entities/HairdresserService";
 import { Appointment } from "src/Entities/Appointments/Appointment";
 import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
+import { MailSenderService } from "src/EmailConfirmation/MailSenderService";
+import { Client } from "src/Entities/Client";
 
 export class AppointmentServiceImpl {
   constructor(
     @Inject(BarberServiceImpl)
-    private readonly barberService: BarberServiceImpl,
-    @Inject(AppointmentRepositoryImpl)
-    private readonly appointmentRepository: AppointmentRepositoryImpl
-  ) {}
+    private readonly barberService: BarberServiceImpl // @Inject(AppointmentRepositoryImpl)
+  ) // private readonly appointmentRepository: AppointmentRepositoryImpl
+  {}
 
   public async getAllBarberAppointments(barberId: string) {
-    // return await this.appointmentRepository.getAllBarberAppointmentsOnDay(
-    //   barberId
-    // );
+    return await this.barberService.getAllBarberAppointments(barberId);
   }
 
   public async create(
@@ -40,6 +39,22 @@ export class AppointmentServiceImpl {
       clientId
     );
 
+    if (appointment && appointment.isConfirmed) {
+      this.sendEmailConfirmedAppointment(appointment, appointment.client);
+    }
     return appointment;
+  }
+
+  private async sendEmailConfirmedAppointment(
+    appointment: Appointment,
+    client: Client
+  ) {
+    const mailSender = MailSenderService.getInstance();
+    await mailSender.sendMailToClientAppointmentConfirmed(
+      "aleonornyikita@gmail.com",
+      "aleonornyikita@gmail.com",
+      appointment,
+      client.id
+    );
   }
 }

@@ -8,19 +8,23 @@ import {
   Delete,
   Res,
   HttpStatus,
-  GoneException,
-  UseGuards,
+  Inject,
 } from "@nestjs/common";
 import { ClientsService } from "../Services/ClientServiceImpl";
 import { Client } from "src/Entities/Client";
 import { CleintDto } from "src/DTOS/ClientDto.dts";
 import { statusEnum } from "src/EmailConfirmation/Status";
 import { Response } from "express";
-import { AuthGuard } from "@nestjs/passport";
+import { Appointment } from "src/Entities/Appointments/Appointment";
+import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
 
 @Controller("clients")
 export class ClientsController {
-  constructor(private readonly clientsService: ClientsService) {}
+  constructor(
+    private readonly clientsService: ClientsService,
+    @Inject(AppointmentRepositoryImpl)
+    private readonly appointmentRepository: AppointmentRepositoryImpl
+  ) {}
 
   @Post()
   create(@Body() body: CleintDto, @Res() response: Response) {
@@ -123,6 +127,28 @@ export class ClientsController {
       if (client && !client.deletedAt) {
         response.status(HttpStatus.ACCEPTED).json(client).send();
       } else if (!client) {
+        response.status(HttpStatus.NOT_FOUND).json().send();
+      }
+    } catch (exception) {
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
+    }
+  }
+
+  @Get(":id/appointments")
+  async getAppointments(
+    @Param("id") id: string,
+    @Res() response: Response
+  ): Promise<Appointment[]> {
+    try {
+      const client = await this.clientsService.findOne(id);
+
+      if (client) {
+        const appointments =
+          await this.appointmentRepository.getAllClientAppointmnts(id);
+
+        response.status(HttpStatus.OK).json(appointments).send();
+        return appointments;
+      } else if (client === undefined) {
         response.status(HttpStatus.NOT_FOUND).json().send();
       }
     } catch (exception) {

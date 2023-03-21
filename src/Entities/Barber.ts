@@ -74,4 +74,14 @@ export class Barber extends User {
 
     return appointment;
   }
+
+  public toString(): string {
+    return `Barber: 
+    Last Name : ${this.lastName}
+    First Name: ${this.firstName}
+    Age: ${this.age}, 
+    Username: ${this.username}, 
+    Experience: ${this.experience}, 
+    Nationalities: ${this.nationalities}`;
+  }
 }

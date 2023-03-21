@@ -1,6 +1,7 @@
 import { InjectRepository } from "@nestjs/typeorm";
 import { Injectable } from "nestjs-injectable";
 import { Appointment } from "src/Entities/Appointments/Appointment";
+import { Client } from "src/Entities/Client";
 import { Repository } from "typeorm";
 
 @Injectable()
@@ -9,19 +10,6 @@ export class AppointmentRepositoryImpl {
     @InjectRepository(Appointment)
     private readonly appointmentRepository: Repository<Appointment>
   ) {}
-
-  async getAllBarberAppointments(
-    barberId: string
-  ): Promise<[Appointment[], number]> {
-    return this.appointmentRepository
-      .createQueryBuilder("appointment")
-      .select("appointment")
-      .leftJoinAndSelect("appointment.barber", "barber")
-      .where("barber.id = :barberId", {
-        barberId,
-      })
-      .getManyAndCount();
-  }
 
   async getAllAppointments(): Promise<[Appointment[], number]> {
     return this.appointmentRepository
@@ -34,7 +22,8 @@ export class AppointmentRepositoryImpl {
     return this.appointmentRepository
       .createQueryBuilder("appointment")
       .select("appointment")
-      .where("appointment.id = :id", {
+      .leftJoinAndSelect("appointment.client", "client")
+      .where("appointment.id = :appointmentId", {
         appointmentId,
       })
       .getOne();
@@ -50,6 +39,17 @@ export class AppointmentRepositoryImpl {
         day,
       })
       .getManyAndCount();
+  }
+
+  async getAllClientAppointmnts(id: string): Promise<Appointment[]> {
+    return await this.appointmentRepository
+      .createQueryBuilder("appointment")
+      .select("appointment")
+      .leftJoinAndSelect("appointment.client", "client")
+      .where("client.id = :id", {
+        id,
+      })
+      .getMany();
   }
 
   async createOrUpdate(appointment: Appointment): Promise<void> {

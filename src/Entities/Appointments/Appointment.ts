@@ -38,12 +38,6 @@ export class Appointment {
   @JoinColumn()
   service: HairdresserService;
 
-  @OneToOne(() => Barber, {
-    cascade: ["insert", "update"],
-  })
-  @JoinColumn()
-  barber: Barber;
-
   @ManyToOne(() => Day, (day) => day.appointments)
   day: Day;
 
@@ -65,10 +59,6 @@ export class Appointment {
 
   public setClient(client: Client): void {
     this.client = client;
-  }
-
-  public setBarber(client: Barber): void {
-    this.barber = this.barber;
   }
 
   public setBooked(booked: boolean): void {
