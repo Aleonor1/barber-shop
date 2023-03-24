@@ -22,10 +22,36 @@ export class AppointmentController {
     private readonly appointmentService: AppointmentServiceImpl
   ) {}
 
+  @Get("/:appointmentId")
+  async getAppointmentById(@Param("id") id: string) {
+    try {
+      this.appointmentService.getAllBarberAppointments(id);
+    } catch (exception) {
+      console.log(exception);
+    }
+  }
+
   @Get("/:barberId")
   async getAllBarberAppointments(@Param("barberId") barberId: string) {
     try {
       this.appointmentService.getAllBarberAppointments(barberId);
+    } catch (exception) {
+      console.log(exception);
+    }
+  }
+
+  @Get("/:barberId")
+  async getAllBarberAppointmentsOnDay(
+    @Param("barberId") barberId: string,
+    @Param("monthNumber") monthNumber: number,
+    @Param("dayNumber") dayNumber: number
+  ) {
+    try {
+      this.appointmentService.getAllBarberAppointmentsOnSpecificDate(
+        barberId,
+        monthNumber,
+        dayNumber
+      );
     } catch (exception) {
       console.log(exception);
     }

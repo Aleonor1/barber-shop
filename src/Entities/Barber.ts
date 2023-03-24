@@ -60,7 +60,7 @@ export class Barber extends User {
     from: string,
     to: string
   ): Appointment {
-    const month = this.year.months.find(
+    const month = this?.year?.months?.find(
       (findMonth) => findMonth.monthNumber === monthAsNumber
     );
 

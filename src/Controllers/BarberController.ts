@@ -11,14 +11,17 @@ import {
   Patch,
   Post,
   Put,
+  Query,
   Req,
   Res,
 } from "@nestjs/common";
-import { Response, response } from "express";
+import { Request, Response, query, response } from "express";
 import { BarberDto } from "src/DTOS/BarberDto.dts";
 import { Appointment } from "src/Entities/Appointments/Appointment";
 import { Barber } from "src/Entities/Barber";
 import { BarberServiceImpl } from "src/Services/BarberServiceImpl";
+import { DayAndMonthQueryParams } from "src/Utils/QueryParams/DayAndMonthQueryParam";
+import { OptionalDayAndMonthQueryParams } from "src/Utils/QueryParams/OptionalDayAndMonthQueryParam";
 
 @Controller("barber")
 export class BarberController {
@@ -142,12 +145,22 @@ export class BarberController {
   @Get("/:id/allAppointments")
   async getAllBarberAppointments(
     @Param("id") id: string,
-    @Res() response: Response
+    @Res() response: Response,
+    @Query() query: OptionalDayAndMonthQueryParams
   ) {
     try {
-      const appointments = await this.barberService.getAllBarberAppointments(
-        id
-      );
+      let appointments;
+      if (query && query.month && query.day) {
+        const [month, day] = [query.month - 1, query.day];
+        appointments =
+          await this.barberService.getAllBarberAppointmentsOnSpecificDate(
+            id,
+            month,
+            day
+          );
+      } else {
+        appointments = await this.barberService.getAllBarberAppointments(id);
+      }
 
       response.status(HttpStatus.OK).json(appointments).send();
       return appointments;
@@ -159,14 +172,17 @@ export class BarberController {
   @Get("/:id/freeAppointmentsOnDay")
   async getEmptyAppointmentsFromBarber(
     @Param("id") id: string,
-    @Param("month") month: number,
-    @Param("day") day: number,
-    @Res() response: Response
-  ) {
+    @Res() response: Response,
+    @Query() query: DayAndMonthQueryParams
+  ): Promise<Appointment[]> {
+    const [month, day] = [query.month - 1, query.day];
     try {
-      const appointments = await this.barberService.getBarberEmptyAppointments(
-        id
-      );
+      const appointments =
+        await this.barberService.getAllBarberFreeAppointmentsOnSpecificDate(
+          id,
+          month,
+          day
+        );
 
       response.status(HttpStatus.OK).json(appointments).send();
       return appointments;

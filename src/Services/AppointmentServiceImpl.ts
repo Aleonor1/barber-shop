@@ -12,12 +12,17 @@ import { Client } from "src/Entities/Client";
 export class AppointmentServiceImpl {
   constructor(
     @Inject(BarberServiceImpl)
-    private readonly barberService: BarberServiceImpl // @Inject(AppointmentRepositoryImpl)
-  ) // private readonly appointmentRepository: AppointmentRepositoryImpl
-  {}
+    private readonly barberService: BarberServiceImpl,
+    @Inject(AppointmentRepositoryImpl)
+    private readonly appointmentRepository: AppointmentRepositoryImpl
+  ) {}
 
   public async getAllBarberAppointments(barberId: string) {
     return await this.barberService.getAllBarberAppointments(barberId);
+  }
+
+  public async getAppointmentById(id: string) {
+    return await this.appointmentRepository.getAppointmentById(id);
   }
 
   public async create(
@@ -55,6 +60,18 @@ export class AppointmentServiceImpl {
       "aleonornyikita@gmail.com",
       appointment,
       client.id
+    );
+  }
+
+  public async getAllBarberAppointmentsOnSpecificDate(
+    barberId: string,
+    monthNumber: number,
+    dayNumber: number
+  ) {
+    return await this.barberService.getAllBarberAppointmentsOnSpecificDate(
+      barberId,
+      monthNumber,
+      dayNumber
     );
   }
 }

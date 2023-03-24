@@ -118,12 +118,38 @@ export class BarberRepositoryImpl implements UserRepository {
         .leftJoinAndSelect("year.months", "months")
         .leftJoinAndSelect("months.days", "days")
         .leftJoinAndSelect("days.appointments", "appointments")
+        .leftJoinAndSelect("appointments.client", "client")
         // .leftJoinAndSelect("appointments.service", "service")
         // .leftJoinAndSelect("appointments.client", "client")
         .where("barber.id = :id", {
           id,
         })
-        .andWhere("months.monthNumber = 7")
+        .getOne()
+    );
+  }
+
+  async getBarberWithAppointmentsOnSpecificDate(
+    id: string,
+    dayNumber: number,
+    monthNumber: number
+  ): Promise<Barber> {
+    return (
+      this.barberRepository
+        .createQueryBuilder("barber")
+        .select("barber")
+        .leftJoinAndSelect("barber.year", "year")
+        .leftJoinAndSelect("year.months", "months")
+        .leftJoinAndSelect("months.days", "days")
+        .leftJoinAndSelect("days.appointments", "appointments")
+        // .leftJoinAndSelect("appointments.service", "service")
+        // .leftJoinAndSelect("appointments.client", "client")
+        .where("barber.id = :id", {
+          id,
+        })
+        .andWhere("months.monthNumber = :monthNumber", {
+          monthNumber: monthNumber,
+        })
+        .andWhere("days.dayNumber = :dayNumber", { dayNumber: dayNumber })
         .getOne()
     );
   }

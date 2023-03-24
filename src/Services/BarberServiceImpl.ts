@@ -248,6 +248,58 @@ export class BarberServiceImpl {
     return appointments;
   }
 
+  async getAllBarberAppointmentsOnSpecificDate(
+    barberId: string,
+    monthNumber: number,
+    dayNumber: number
+  ): Promise<Appointment[]> {
+    const barber =
+      await this.barberRepository.getBarberWithAppointmentsOnSpecificDate(
+        barberId,
+        dayNumber,
+        monthNumber
+      );
+
+    if (!barber) {
+      throw new BarberNotFoundError();
+    }
+
+    const appointments = barber.year.months.flatMap((month) => {
+      return month.days.flatMap((day) => {
+        return day.appointments.filter(
+          (appointment) => appointment.booked && appointment.isConfirmed
+        );
+      });
+    });
+
+    return appointments;
+  }
+
+  async getAllBarberFreeAppointmentsOnSpecificDate(
+    barberId: string,
+    monthNumber: number,
+    dayNumber: number
+  ): Promise<Appointment[]> {
+    const barber =
+      await this.barberRepository.getBarberWithAppointmentsOnSpecificDate(
+        barberId,
+        dayNumber,
+        monthNumber
+      );
+
+    if (!barber) {
+      throw new BarberNotFoundError();
+    }
+
+    const appointments = barber.year.months.flatMap((month) => {
+      return month.days.flatMap((day) => {
+        return day.appointments.filter((appointment) => !appointment.booked);
+      });
+    });
+
+    return appointments;
+  }
+
   async getBarberEmptyAppointments(barberId: string): Promise<Appointment[]> {
     const barber = await this.barberRepository.getBarberWithAppointments(
       barberId
