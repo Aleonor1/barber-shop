@@ -29,6 +29,19 @@ export class BarberRepositoryImpl implements UserRepository {
       .getOne();
   }
 
+  async getExpiredBarbers(): Promise<Barber[]> {
+    const currentDate = new Date();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const expiredBarbers = await this.barberRepository
+      .createQueryBuilder("barber")
+      .where("barber.deletedAt < :thirtyDaysAgo", { thirtyDaysAgo })
+      .getMany();
+
+    return expiredBarbers;
+  }
+
   async createOrUpdate(barber: Barber): Promise<Barber> {
     await this.barberRepository.save(barber);
     return await this.findByGeneric("email", barber.email);
@@ -103,6 +116,16 @@ export class BarberRepositoryImpl implements UserRepository {
     await this.barberRepository
       .createQueryBuilder()
       .restore()
+      .where("id = :id", { id: barberId })
+      .execute();
+
+    return await this.findById(barberId);
+  }
+
+  async deletePermanently(barberId: string): Promise<Barber> {
+    await this.barberRepository
+      .createQueryBuilder("barber")
+      .delete()
       .where("id = :id", { id: barberId })
       .execute();
 

@@ -42,10 +42,18 @@ export class Appointment {
   day: Day;
 
   @Column({ default: false })
-  isConfirmed: Boolean;
+  isConfirmed: boolean;
+
+  //TODO Add service to send mail when appointment is completed
+  @Column({ default: true })
+  isCompleted: boolean;
 
   confirm() {
     this.isConfirmed = true;
+  }
+
+  complete() {
+    this.isCompleted = true;
   }
 
   constructor(from: string, to: string) {

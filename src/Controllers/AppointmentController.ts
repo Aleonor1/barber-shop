@@ -22,21 +22,41 @@ export class AppointmentController {
     private readonly appointmentService: AppointmentServiceImpl
   ) {}
 
-  @Get("/:appointmentId")
-  async getAppointmentById(@Param("id") id: string) {
+  @Get("/:id")
+  async getAppointmentById(
+    @Param("id") id: string,
+    @Res() response: Response
+  ): Promise<Appointment> {
     try {
-      this.appointmentService.getAllBarberAppointments(id);
+      const appointment = await this.appointmentService.getAppointmentById(id);
+      if (appointment) {
+        response.status(HttpStatus.OK).json(appointment).send();
+      } else {
+        response.status(HttpStatus.NOT_FOUND).json().send();
+      }
+      return appointment;
     } catch (exception) {
       console.log(exception);
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
     }
   }
 
-  @Get("/:barberId")
-  async getAllBarberAppointments(@Param("barberId") barberId: string) {
+  @Get("/getAppointmentByBarber/:barberId")
+  async getAllBarberAppointments(
+    @Param("barberId") barberId: string,
+    @Res() response: Response
+  ) {
     try {
-      this.appointmentService.getAllBarberAppointments(barberId);
+      const appointments =
+        await this.appointmentService.getAllBarberAppointments(barberId);
+      if (appointments) {
+        response.status(HttpStatus.OK).json(appointments).send();
+      } else {
+        response.status(HttpStatus.NOT_FOUND).json().send();
+      }
     } catch (exception) {
       console.log(exception);
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
     }
   }
 
@@ -44,14 +64,21 @@ export class AppointmentController {
   async getAllBarberAppointmentsOnDay(
     @Param("barberId") barberId: string,
     @Param("monthNumber") monthNumber: number,
-    @Param("dayNumber") dayNumber: number
+    @Param("dayNumber") dayNumber: number,
+    @Res() response: Response
   ) {
     try {
-      this.appointmentService.getAllBarberAppointmentsOnSpecificDate(
-        barberId,
-        monthNumber,
-        dayNumber
-      );
+      const appointments =
+        this.appointmentService.getAllBarberAppointmentsOnSpecificDate(
+          barberId,
+          monthNumber,
+          dayNumber
+        );
+      if (appointments) {
+        response.status(HttpStatus.OK).json(appointments).send();
+      } else {
+        response.status(HttpStatus.NOT_FOUND).json().send();
+      }
     } catch (exception) {
       console.log(exception);
     }
