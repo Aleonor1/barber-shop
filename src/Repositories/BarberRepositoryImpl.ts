@@ -30,13 +30,13 @@ export class BarberRepositoryImpl implements UserRepository {
   }
 
   async getExpiredBarbers(): Promise<Barber[]> {
-    const currentDate = new Date();
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
     const expiredBarbers = await this.barberRepository
       .createQueryBuilder("barber")
-      .where("barber.deletedAt < :thirtyDaysAgo", { thirtyDaysAgo })
+      .withDeleted()
+      .andWhere("barber.deletedAt < :thirtyDaysAgo", { thirtyDaysAgo })
       .getMany();
 
     return expiredBarbers;

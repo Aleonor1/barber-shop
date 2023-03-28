@@ -6,6 +6,7 @@ import {
   IsOptional,
   IsString,
 } from "class-validator";
+import { Year } from "src/Entities/Appointments/Year";
 import { ExperienceLevel } from "src/Utils/ExperienceLevel";
 
 export class BarberDto {
@@ -60,4 +61,7 @@ export class BarberDto {
   @IsString()
   @IsNotEmpty()
   public addressName: string;
+
+  @IsOptional()
+  public year: Year;
 }

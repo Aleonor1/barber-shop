@@ -15,14 +15,29 @@ import {
   Req,
   Res,
 } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
 import { Request, Response, query, response } from "express";
 import { BarberDto } from "src/DTOS/BarberDto.dts";
+import { UpdateBarberDto } from "src/DTOS/UpdateBarberDto.dts";
 import { Appointment } from "src/Entities/Appointments/Appointment";
 import { Barber } from "src/Entities/Barber";
 import { BarberServiceImpl } from "src/Services/BarberServiceImpl";
 import { DayAndMonthQueryParams } from "src/Utils/QueryParams/DayAndMonthQueryParam";
 import { OptionalDayAndMonthQueryParams } from "src/Utils/QueryParams/OptionalDayAndMonthQueryParam";
 
+/*
+    GET /: retrieves all barbers
+    GET /:id: retrieves a barber by ID
+    GET /verifyAppointment/:barberId/:appointmnetId: verifies if an appointment with the given ID exists for the barber with the given ID
+    POST /: creates a new barber
+    PATCH /:id: updates an existing barber by ID
+    DELETE /:id: deletes a barber by ID
+    PATCH /restore/:id: restores a soft-deleted barber by ID
+    GET /:id/allAppointments: retrieves all appointments for a given barber, optionally filtered by a specific day and month
+    GET /:id/freeAppointmentsOnDay: retrieves all available appointments for a given barber on a specific day
+*/
+
+@ApiTags("barbers")
 @Controller("barber")
 export class BarberController {
   constructor(
@@ -108,24 +123,29 @@ export class BarberController {
     }
   }
 
-  @Patch("/:id")
-  update(
+  @Patch(":id")
+  async updateBarber(
     @Param("id") id: string,
-    newBarber: Barber,
-    @Res() response: Response
-  ): void {
+    @Body() updateBarberDto: UpdateBarberDto
+  ): Promise<Barber> {
     try {
-      const barber = this.barberService.updateBarber(id, newBarber);
-      response.status(HttpStatus.OK).json(barber).send();
-    } catch (exception) {
-      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
+      const updatedBarber = await this.barberService.updateBarber(
+        id,
+        updateBarberDto
+      );
+      return updatedBarber;
+    } catch (error) {
+      response.status(HttpStatus.BAD_REQUEST).json(error.message).send();
     }
   }
 
   @Delete("/:id")
-  deleteBarber(@Param("id") id: string, @Res() response: Response): void {
+  async deleteBarber(
+    @Param("id") id: string,
+    @Res() response: Response
+  ): Promise<void> {
     try {
-      const barber = this.barberService.deleteBarber(id);
+      const barber = await this.barberService.deleteBarber(id);
       response.status(HttpStatus.OK).json(barber).send();
     } catch (exception) {
       response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
@@ -188,6 +208,20 @@ export class BarberController {
       return appointments;
     } catch (exception) {
       response.status(HttpStatus.OK).json(exception.message).send();
+    }
+  }
+
+  @Post("/:id/requestVacation")
+  async requestVacation(
+    @Param("id") id: string,
+    @Body() vacationRequest: VacationRequest,
+    @Res() response: Response
+  ): Promise<void> {
+    try {
+      const result = await this.barberService.requestVacation(vacationRequest);
+      response.status(HttpStatus.OK).json(result).send();
+    } catch (exception) {
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
     }
   }
 }

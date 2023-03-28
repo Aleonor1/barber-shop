@@ -136,13 +136,13 @@ export class ClientRepositoryImpl implements UserRepository {
   }
 
   async delete(clientId: string): Promise<Client> {
-    this.clientRepositories
+    await this.clientRepositories
       .createQueryBuilder("client")
       .softDelete()
       .where("id = :id", { id: clientId })
       .execute();
 
-    return this.findById(clientId);
+    return await this.findById(clientId);
   }
 
   async restoreSoftDelete(clientId: string): Promise<Client> {
@@ -153,5 +153,28 @@ export class ClientRepositoryImpl implements UserRepository {
       .execute();
 
     return this.findById(clientId);
+  }
+
+  async getExpiredClients(): Promise<Client[]> {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const expiredClients = await this.clientRepositories
+      .createQueryBuilder("client")
+      .withDeleted()
+      .andWhere("client.deletedAt < :thirtyDaysAgo", { thirtyDaysAgo })
+      .getMany();
+
+    return expiredClients;
+  }
+
+  async deletePermanently(clientId: string): Promise<Client> {
+    await this.clientRepositories
+      .createQueryBuilder("client")
+      .delete()
+      .where("id = :id", { id: clientId })
+      .execute();
+
+    return await this.findById(clientId);
   }
 }

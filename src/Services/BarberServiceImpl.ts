@@ -1,6 +1,6 @@
 import { Barber } from "src/Entities/Barber";
 import { Injectable } from "nestjs-injectable";
-import { Inject } from "@nestjs/common";
+import { Inject, Logger } from "@nestjs/common";
 import { BarberRepositoryImpl } from "src/Repositories/BarberRepositoryImpl";
 import { ExperienceLevel } from "src/Utils/ExperienceLevel";
 import { BasicAddressRepository } from "src/Repositories/BasicAddressRepository";
@@ -18,9 +18,12 @@ import { BarberNotFoundError } from "src/Utils/CustomErrors/BarberNotFoundError"
 import { ClientNotFoundError } from "src/Utils/CustomErrors/ClientNotFoundError";
 import { MailSenderService } from "src/EmailConfirmation/MailSenderService";
 import { AppointmentNotFoundError } from "src/Utils/CustomErrors/AppointmentNotFoundError";
+import { UpdateBarberDto } from "src/DTOS/UpdateBarberDto.dts";
+import { Vacation } from "src/Entities/Vacation";
 
 Injectable();
 export class BarberServiceImpl {
+  private readonly logger = new Logger(BarberServiceImpl.name);
   constructor(
     @Inject(BarberRepositoryImpl)
     private readonly barberRepository: BarberRepositoryImpl,
@@ -37,6 +40,7 @@ export class BarberServiceImpl {
   ) {}
 
   public async getBarberById(id: string): Promise<Barber> {
+    this.logger.log(`Getting barber by ID: ${id}`);
     return await this.barberRepository.findById(id);
   }
 
@@ -56,6 +60,7 @@ export class BarberServiceImpl {
     addressName?: string,
     id?: string
   ): Promise<Barber> {
+    this.logger.log(`Creating new barber`);
     const address = await this.basicAddressRepository.handleAddress(
       addressName,
       city,
@@ -112,27 +117,62 @@ export class BarberServiceImpl {
   }
 
   async getAllBarbers(): Promise<[Barber[], number]> {
+    this.logger.log(`Get all barbers`);
     return await this.barberRepository.getAllBarbers();
   }
 
-  async updateBarber(id: string, newBarber: Barber): Promise<Barber> {
-    return this.barberRepository.update(id, newBarber);
-  }
-
-  async deleteBarber(id: string): Promise<Barber> {
-    const barber = await this.barberRepository.delete(id);
+  async updateBarber(
+    id: string,
+    updateBarberDto: UpdateBarberDto
+  ): Promise<Barber> {
+    this.logger.log(
+      `Update barber with id: ${id} with new fields: ${updateBarberDto}`
+    );
+    const barber = await this.barberRepository.findById(id);
     if (!barber) {
       throw new BarberNotFoundError();
     }
 
+    const { experience, nationalities, year, ...userData } = updateBarberDto;
+    const updatedBarber = Object.assign(barber, userData);
+    if (experience) {
+      updatedBarber.experience = experience;
+    }
+    if (nationalities) {
+      let countriesFromDb: Country[];
+
+      nationalities.forEach(
+        async (coun) => await this.countryRepositoryImpl.findById(coun)
+      );
+
+      updatedBarber.nationalities = countriesFromDb;
+    }
+    if (year) {
+      updatedBarber.year = year;
+    }
+
+    return await this.barberRepository.createOrUpdate(updatedBarber);
+  }
+
+  async deleteBarber(id: string): Promise<Barber> {
+    this.logger.log(`Soft delete barber with id:${id}`);
+    let barber = await this.barberRepository.findById(id);
+    if (!barber) {
+      throw new BarberNotFoundError();
+    }
+
+    barber = await this.barberRepository.delete(id);
     return barber;
   }
 
   async restoreSoftDelete(id: string): Promise<Barber> {
-    const barber = await this.barberRepository.restoreSoftDelete(id);
+    this.logger.log(`Restore soft delete for barber with id:${id}`);
+    let barber = await this.barberRepository.findById(id);
+
     if (!barber) {
       throw new BarberNotFoundError();
     }
+    barber = await this.barberRepository.restoreSoftDelete(id);
     return barber;
   }
 
@@ -178,6 +218,13 @@ export class BarberServiceImpl {
     } else if (!client) {
       throw new ClientNotFoundError();
     }
+    const date = new Date();
+    date.setMonth(month);
+    date.setDate(day);
+    date.setHours(0);
+    if (barber.hasVacation(date)) {
+      throw new Error("Barber has vacation");
+    }
     let appointment = barber.getAppointment(month, day, from, to);
     if (appointment.booked) {
       throw new Error("Appointment is already booked");
@@ -189,9 +236,7 @@ export class BarberServiceImpl {
       appointment.setService(hairDresserService);
       appointment.setClient(client);
       appointment.setBooked(true);
-      // appointment.setBarber(barber);
       await this.appointmentRepository.createOrUpdate(appointment);
-      // this.barberRepository.createOrUpdate(barber);
     }
 
     await this.sendEmailCreatedAppointment(appointment, barber);
@@ -311,5 +356,42 @@ export class BarberServiceImpl {
     });
 
     return appointments;
+  }
+
+  async getExpiredBarbers(): Promise<Barber[]> {
+    const barbers = await this.barberRepository.getExpiredBarbers();
+    return barbers;
+  }
+
+  async deletePermanently(id: string): Promise<Barber> {
+    const barber = await this.barberRepository.deletePermanently(id);
+    return barber;
+  }
+
+  async requestVacation(vacationRequest: VacationRequest): Promise<void> {
+    const { barberId, startDate, endDate } = vacationRequest;
+    // Check if the barber is already on vacation during the requested time period
+    const barber = await this.barberRepository.findById(barberId);
+
+    if (!barber) {
+      throw new BarberNotFoundError();
+    }
+
+    const isOnVacation = barber.getVacations().some((vacation) => {
+      return startDate >= vacation.startDate && endDate <= vacation.endDate;
+    });
+
+    if (isOnVacation) {
+      console.log(
+        "Barber is already on vacation during requested time period."
+      );
+      return;
+    }
+
+    // Add the vacation to the list of active vacations
+    const vacation = new Vacation(startDate, endDate);
+    barber.addVacations(vacation);
+
+    this.barberRepository.update(barber.id, barber);
   }
 }

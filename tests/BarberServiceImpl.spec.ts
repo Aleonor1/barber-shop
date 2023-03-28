@@ -103,7 +103,7 @@ describe("BarberServiceImpl", () => {
           country: "US",
           postalCode: "12345",
         },
-        experience: ExperienceLevel.JUN,
+        experience: ExperienceLevel.JUNIOR,
       };
     });
   });

@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from "typeorm";
 import { User } from "./User";
 import { ExperienceLevel } from "src/Utils/ExperienceLevel";
@@ -12,6 +13,7 @@ import { Country } from "./Country";
 import { Year } from "./Appointments/Year";
 import { HairdresserService } from "./HairdresserService";
 import { Appointment } from "./Appointments/Appointment";
+import { Vacation } from "./Vacation";
 
 @Entity()
 export class Barber extends User {
@@ -27,6 +29,12 @@ export class Barber extends User {
   })
   @JoinColumn()
   year: Year;
+
+  @OneToMany(() => Vacation, (vacation) => vacation.barber, {
+    cascade: ["insert", "update"],
+  })
+  @JoinColumn()
+  vacations: Vacation[];
 
   constructor(
     lastName: string,
@@ -73,6 +81,21 @@ export class Barber extends User {
     });
 
     return appointment;
+  }
+
+  public getVacations(): Vacation[] {
+    return this.vacations;
+  }
+
+  public addVacations(vacationsToAdd: Vacation): void {
+    this.vacations.push(vacationsToAdd);
+  }
+
+  public hasVacation(date: Date): boolean {
+    // check if date is within any of the barber's vacations
+    return this.vacations.some(
+      (vacation) => date >= vacation.startDate && date <= vacation.endDate
+    );
   }
 
   public toString(): string {

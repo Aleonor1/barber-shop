@@ -9,6 +9,8 @@ import { BasicAddressRepository } from "src/Repositories/BasicAddressRepository"
 import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
 import { Appointment } from "src/Entities/Appointments/Appointment";
 import { AppointmentModule } from "./AppointmentModule";
+import { ScheduleModule } from "@nestjs/schedule";
+import { DeleteExpiredClients } from "src/CleanupService/DeleteExpiredClients";
 
 @Module({
   imports: [
@@ -16,10 +18,12 @@ import { AppointmentModule } from "./AppointmentModule";
     TypeOrmModule.forFeature([BasicAddress]),
     TypeOrmModule.forFeature([Appointment]),
     AppointmentModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [ClientsController],
   providers: [
     ClientsService,
+    DeleteExpiredClients,
     ClientRepositoryImpl,
     BasicAddressRepository,
     AppointmentRepositoryImpl,

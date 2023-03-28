@@ -19,11 +19,14 @@ import { Year } from "./Entities/Appointments/Year";
 import { AppointmentModule } from "./Modules/AppointmentModule";
 import { HairdresserService } from "./Entities/HairdresserService";
 import { HairdresserServicesRepositoryImpl } from "./Repositories/HairdresserServicesRepositoryImpl";
+import { ScheduleModule } from "@nestjs/schedule";
+import { Vacation } from "./Entities/Vacation";
 
 @Module({
   imports: [
     BarberModule,
     AppointmentModule,
+    ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([Country, HairdresserService]),
     TypeOrmModule.forRoot({
       type: "postgres",
@@ -43,6 +46,7 @@ import { HairdresserServicesRepositoryImpl } from "./Repositories/HairdresserSer
         Month,
         HairdresserService,
         Year,
+        Vacation,
       ],
       synchronize: true,
       logging: true,

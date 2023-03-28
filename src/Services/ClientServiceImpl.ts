@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, Injectable } from "@nestjs/common";
+import { HttpStatus, Inject, Injectable, Logger } from "@nestjs/common";
 import { ClientRepositoryImpl } from "src/Repositories/ClientRepositoryImpl";
 import { Client } from "src/Entities/Client";
 import { BasicAddressRepository } from "src/Repositories/BasicAddressRepository";
@@ -8,9 +8,13 @@ import { statusEnum } from "src/EmailConfirmation/Status";
 import { MailSenderService } from "src/EmailConfirmation/MailSenderService";
 import { Appointment } from "src/Entities/Appointments/Appointment";
 import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
+import { ClientNotFoundError } from "@/Utils/CustomErrors/ClientNotFoundError";
+import { UpdateClientDto } from "@/DTOS/UpdateClientDto.dts";
 
 @Injectable()
 export class ClientsService {
+  private readonly logger = new Logger(ClientsService.name);
+
   constructor(
     @Inject(ClientRepositoryImpl)
     private readonly clientRepositoryImpl: ClientRepositoryImpl,
@@ -68,6 +72,37 @@ export class ClientsService {
     return dbClient;
   }
 
+  async updateClinet(
+    id: string,
+    updateClientDto: UpdateClientDto
+  ): Promise<Client> {
+    this.logger.log(
+      `Update client with id: ${id} with new fields: ${updateClientDto}`
+    );
+    const client = await this.clientRepositoryImpl.findById(id);
+    if (!client) {
+      throw new ClientNotFoundError();
+    }
+
+    const { nationalities, status, fidelityLevel, ...userData } =
+      updateClientDto;
+    const updateClient = Object.assign(client, userData);
+    // if (nationalities) {
+    //   let countriesFromDb: Country[];
+
+    //   nationalities.forEach(
+    //     async (coun) => await this.countryRepositoryImpl.findById(coun)
+    //   );
+
+    //   updateClient.nationalities = countriesFromDb;
+    // }
+    if (fidelityLevel) {
+      updateClient.fidelityLevel = fidelityLevel;
+    }
+
+    return await this.clientRepositoryImpl.createOrUpdate(updateClient);
+  }
+
   findAll() {
     return this.clientRepositoryImpl.getAllClients();
   }
@@ -98,7 +133,7 @@ export class ClientsService {
     return this.clientRepositoryImpl.findById(id);
   }
 
-  async deleteBarber(id: string): Promise<Client> {
+  async deleteClient(id: string): Promise<Client> {
     return this.clientRepositoryImpl.delete(id);
   }
 
@@ -108,5 +143,15 @@ export class ClientsService {
 
   async getAllClientAppointments(id: string): Promise<Appointment[]> {
     return await this.appointmentRepository.getAllClientAppointmnts(id);
+  }
+
+  async getExpiredClients(): Promise<Client[]> {
+    const barbers = await this.clientRepositoryImpl.getExpiredClients();
+    return barbers;
+  }
+
+  async deletePermanently(id: string): Promise<Client> {
+    const barber = await this.clientRepositoryImpl.deletePermanently(id);
+    return barber;
   }
 }

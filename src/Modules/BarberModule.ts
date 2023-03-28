@@ -16,6 +16,9 @@ import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/Appoint
 import { HairdresserServicesRepositoryImpl } from "src/Repositories/HairdresserServicesRepositoryImpl";
 import { HairdresserService } from "src/Entities/HairdresserService";
 import { AppointmentModule } from "./AppointmentModule";
+import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
+import { ScheduleModule } from "@nestjs/schedule";
+import { DeleteExpiredBarbers } from "src/CleanupService/DeleteExpiredBarbers";
 
 @Module({
   imports: [
@@ -25,9 +28,12 @@ import { AppointmentModule } from "./AppointmentModule";
     TypeOrmModule.forFeature([Appointment]),
     TypeOrmModule.forFeature([Client]),
     TypeOrmModule.forFeature([HairdresserService]),
+    SwaggerModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [BarberController],
   providers: [
+    DeleteExpiredBarbers,
     BarberServiceImpl,
     BarberRepositoryImpl,
     BasicAddressRepository,

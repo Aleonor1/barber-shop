@@ -5,6 +5,7 @@ import {
   IsNotEmptyObject,
   IsNumber,
   IsObject,
+  IsOptional,
   IsString,
 } from "class-validator";
 import { Country } from "src/Entities/Country";
@@ -17,6 +18,13 @@ export class CleintDto {
   @IsString()
   @IsNotEmpty()
   public lastName: string;
+
+  @IsNumber()
+  @IsOptional()
+  fidelityLevel: number;
+
+  @IsOptional()
+  public status: string;
 
   @IsString()
   @IsNotEmpty()

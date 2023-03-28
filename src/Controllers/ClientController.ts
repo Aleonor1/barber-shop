@@ -17,6 +17,7 @@ import { statusEnum } from "src/EmailConfirmation/Status";
 import { Response } from "express";
 import { Appointment } from "src/Entities/Appointments/Appointment";
 import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
+import { UpdateClientDto } from "@/DTOS/UpdateClientDto.dts";
 
 @Controller("clients")
 export class ClientsController {
@@ -76,16 +77,27 @@ export class ClientsController {
     }
   }
 
-  //TODO
-  // @Patch(":id")
-  // update(@Param("id") id: string, @Body() body: Body) {
-  //   this.clientsService.update(id, body);
-  // }
+  @Patch(":id")
+  async updateClient(
+    @Param("id") id: string,
+    @Body() updateClientDto: UpdateClientDto,
+    @Res() response: Response
+  ): Promise<Client> {
+    try {
+      const updateClient = await this.clientsService.updateClinet(
+        id,
+        updateClientDto
+      );
+      return updateClient;
+    } catch (error) {
+      response.status(HttpStatus.BAD_REQUEST).json(error.message).send();
+    }
+  }
 
   @Delete(":id")
   async remove(@Param("id") id: string, @Res() response: Response) {
     try {
-      const client = await this.clientsService.deleteBarber(id);
+      const client = await this.clientsService.deleteClient(id);
 
       if (client.deletedAt) {
         response.status(HttpStatus.OK).json().send();
