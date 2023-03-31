@@ -8,6 +8,8 @@ import { Appointment } from "src/Entities/Appointments/Appointment";
 import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
 import { MailSenderService } from "src/EmailConfirmation/MailSenderService";
 import { Client } from "src/Entities/Client";
+import { AppointmentStatus } from "@/Utils/AppointmentStatus";
+import { ExperienceLevel } from "@/Utils/ExperienceLevel";
 
 export class AppointmentServiceImpl {
   constructor(
@@ -43,10 +45,6 @@ export class AppointmentServiceImpl {
       service,
       clientId
     );
-
-    if (appointment && appointment.isConfirmed) {
-      this.sendEmailConfirmedAppointment(appointment, appointment.client);
-    }
     return appointment;
   }
 
@@ -61,6 +59,35 @@ export class AppointmentServiceImpl {
       appointment,
       client.id
     );
+  }
+
+  //TODO FINISH
+  // async cancelAppointment(id: string): Promise<Appointment> {
+  //   const appointment = await this.appointmentRepository.getAppointmentById(id);
+  //   if (!appointment) {
+  //     throw new Error(`Appointment with id ${id} not found.`);
+  //   }
+  //   appointment.isCancelled = true;
+  //   return this.appointmentRepository.createOrUpdate(appointment);
+  // }
+
+  async completeAppointment(id: string): Promise<Appointment> {
+    const appointment = await this.appointmentRepository.getAppointmentById(id);
+    if (!appointment) {
+      throw new Error(`Appointment with id ${id} not found.`);
+    }
+    appointment.complete();
+    // return
+    this.appointmentRepository.createOrUpdate(appointment);
+    return null;
+  }
+
+  async findAppointmentById(id: string): Promise<Appointment> {
+    const appointment = await this.appointmentRepository.getAppointmentById(id);
+    if (!appointment) {
+      throw new Error(`Appointment with id ${id} not found.`);
+    }
+    return appointment;
   }
 
   public async getAllBarberAppointmentsOnSpecificDate(

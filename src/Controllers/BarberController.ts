@@ -51,6 +51,8 @@ export class BarberController {
       if (barbers) {
         response.status(HttpStatus.OK).json(barbers).send();
         return barbers;
+      } else if (!barbers) {
+        response.status(HttpStatus.NO_CONTENT).json().send();
       } else {
         response.status(HttpStatus.NO_CONTENT).json().send();
       }

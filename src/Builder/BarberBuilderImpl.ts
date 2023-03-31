@@ -6,6 +6,7 @@ import { first } from "rxjs";
 import { ExperienceLevel } from "src/Utils/ExperienceLevel";
 import { Country } from "src/Entities/Country";
 import { Year } from "src/Entities/Appointments/Year";
+import { Vacation } from "@/Entities/Vacation";
 
 export class BarberBuilderImpl implements UserBuilder {
   public firstName: string;
@@ -19,6 +20,7 @@ export class BarberBuilderImpl implements UserBuilder {
   public username: string;
   public password: string;
   public year: Year;
+  public vacation: Vacation[];
 
   public setExperience(experience: ExperienceLevel) {
     this.experience = experience;
@@ -47,6 +49,11 @@ export class BarberBuilderImpl implements UserBuilder {
 
   public setUsername(username: string) {
     this.username = username;
+    return this;
+  }
+
+  public setVacation() {
+    this.vacation = new Array<Vacation>();
     return this;
   }
 

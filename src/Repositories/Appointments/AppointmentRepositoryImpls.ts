@@ -51,7 +51,8 @@ export class AppointmentRepositoryImpl {
       .getMany();
   }
 
-  async createOrUpdate(appointment: Appointment): Promise<void> {
+  async createOrUpdate(appointment: Appointment): Promise<Appointment> {
     await this.appointmentRepository.save(appointment);
+    return this.getAppointmentById(appointment.id);
   }
 }

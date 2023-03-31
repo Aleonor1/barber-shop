@@ -9,4 +9,7 @@ module.exports = {
   moduleNameMapper: {
     ...pathsToModuleNameMapper(paths, { prefix: "<rootDir>" }),
   },
+  moduleFileExtensions: ["js", "json", "ts"],
+  rootDir: "./",
+  modulePaths: ["<rootDir>"],
 };

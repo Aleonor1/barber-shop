@@ -11,6 +11,7 @@ import { Client } from "../Client";
 import { Day } from "./Day";
 import { HairdresserService } from "../HairdresserService";
 import { Barber } from "../Barber";
+import { AppointmentStatus } from "@/Utils/AppointmentStatus";
 
 @Entity()
 export class Appointment {
@@ -19,6 +20,9 @@ export class Appointment {
 
   @Column()
   from: string;
+
+  @Column({ default: 0 })
+  price: number;
 
   @Column()
   to: string;
@@ -41,19 +45,23 @@ export class Appointment {
   @ManyToOne(() => Day, (day) => day.appointments)
   day: Day;
 
-  @Column({ default: false })
-  isConfirmed: boolean;
-
-  //TODO Add service to send mail when appointment is completed
-  @Column({ default: true })
-  isCompleted: boolean;
+  @Column({
+    type: "enum",
+    enum: AppointmentStatus,
+    default: AppointmentStatus.WAITING_FOR_CONFIRMATION,
+  })
+  status: AppointmentStatus;
 
   confirm() {
-    this.isConfirmed = true;
+    this.status = AppointmentStatus.CONFIRMED;
   }
 
   complete() {
-    this.isCompleted = true;
+    this.status = AppointmentStatus.COMPLETED;
+  }
+
+  cancel() {
+    this.status = AppointmentStatus.CANCELLED;
   }
 
   constructor(from: string, to: string) {
@@ -71,5 +79,9 @@ export class Appointment {
 
   public setBooked(booked: boolean): void {
     this.booked = booked;
+  }
+
+  public setPrice(price: number): void {
+    this.price = price;
   }
 }

@@ -4,13 +4,22 @@ import { BasicAddress } from "src/Utils/Address";
 import { Country } from "./Country";
 import { statusEnum } from "src/EmailConfirmation/Status";
 import { Appointment } from "./Appointments/Appointment";
+import { FidelityLevel } from "@/Utils/FidelityLevel";
 
 @Entity()
 export class Client extends User {
-  @Column({ default: 0 })
-  fidelityLevel: number;
+  @Column({
+    type: "enum",
+    enum: FidelityLevel,
+    default: FidelityLevel.BRONZE,
+  })
+  fidelityLevel: FidelityLevel;
 
-  @Column()
+  @Column({
+    type: "enum",
+    enum: statusEnum,
+    default: statusEnum.pending,
+  })
   status: statusEnum;
 
   @Column()
@@ -37,7 +46,6 @@ export class Client extends User {
       username,
       password
     );
-    this.fidelityLevel = 0;
     this.status = statusEnum.pending;
     this.token = token;
   }

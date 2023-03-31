@@ -87,6 +87,7 @@ export class ClientsService {
     const { nationalities, status, fidelityLevel, ...userData } =
       updateClientDto;
     const updateClient = Object.assign(client, userData);
+    //TODO FINISH
     // if (nationalities) {
     //   let countriesFromDb: Country[];
 

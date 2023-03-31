@@ -20,6 +20,7 @@ import { MailSenderService } from "src/EmailConfirmation/MailSenderService";
 import { AppointmentNotFoundError } from "src/Utils/CustomErrors/AppointmentNotFoundError";
 import { UpdateBarberDto } from "src/DTOS/UpdateBarberDto.dts";
 import { Vacation } from "src/Entities/Vacation";
+import { AppointmentStatus } from "@/Utils/AppointmentStatus";
 
 Injectable();
 export class BarberServiceImpl {
@@ -68,7 +69,6 @@ export class BarberServiceImpl {
       street,
       postalCode
     );
-
     let countriesFromDb: Country[];
 
     nationalities.forEach(
@@ -92,7 +92,8 @@ export class BarberServiceImpl {
     return this.barberRepository.createOrUpdate(newBarber);
   }
 
-  private handleAppointments(): Year {
+  //TODO ADD function response to cache
+  public handleAppointments(): Year {
     let appointments: Appointment[] = new Array<Appointment>();
     let months: Month[] = new Array<Month>();
 
@@ -191,7 +192,7 @@ export class BarberServiceImpl {
     if (!appointment) {
       throw new AppointmentNotFoundError();
     }
-    if (appointment && appointment.isConfirmed) {
+    if (appointment && appointment.status === AppointmentStatus.CONFIRMED) {
       throw new Error("Appointment is already confirmed");
     }
     appointment.confirm();
@@ -280,7 +281,9 @@ export class BarberServiceImpl {
     const appointments = barber.year.months.flatMap((month) => {
       return month.days.flatMap((day) => {
         return day.appointments.filter(
-          (appointment) => appointment.booked && appointment.isConfirmed
+          (appointment) =>
+            appointment.booked &&
+            appointment.status === AppointmentStatus.CONFIRMED
         );
       });
     });
@@ -307,7 +310,9 @@ export class BarberServiceImpl {
     const appointments = barber.year.months.flatMap((month) => {
       return month.days.flatMap((day) => {
         return day.appointments.filter(
-          (appointment) => appointment.booked && appointment.isConfirmed
+          (appointment) =>
+            appointment.booked &&
+            appointment.status === AppointmentStatus.CONFIRMED
         );
       });
     });

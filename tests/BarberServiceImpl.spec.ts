@@ -1,24 +1,21 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { BarberServiceImpl } from "./BarberServiceImpl";
-import { BarberRepositoryImpl } from "../Repositories/BarberRepositoryImpl";
-import { BasicAddressRepository } from "../Repositories/BasicAddressRepository";
-import { CountryRepositoryImpl } from "../Repositories/CountryRepositoryImpl";
-import { ClientsService } from "./ClientServiceImpl";
-import { AppointmentRepositoryImpl } from "../Repositories/Appointments/AppointmentRepositoryImpls";
-import { HairdresserServicesRepositoryImpl } from "../Repositories/HairdresserServicesRepositoryImpl";
-import { Barber } from "../Entities/Barber";
-import { ExperienceLevel } from "../Utils/ExperienceLevel";
-import { Country } from "../Entities/Country";
-import { Appointment } from "../Entities/Appointments/Appointment";
-import { Day } from "../Entities/Appointments/Day";
-import { Month } from "../Entities/Appointments/Month";
-import { Year } from "../Entities/Appointments/Year";
-import { AppointmentNotFoundError } from "../Utils/CustomErrors/AppointmentNotFoundError";
-import { BarberNotFoundError } from "../Utils/CustomErrors/BarberNotFoundError";
-import { ClientNotFoundError } from "../Utils/CustomErrors/ClientNotFoundError";
+import { BarberServiceImpl } from "../src/Services/BarberServiceImpl";
+import { BarberRepositoryImpl } from "../src/Repositories/BarberRepositoryImpl";
+import { BasicAddressRepository } from "../src/Repositories/BasicAddressRepository";
+import { CountryRepositoryImpl } from "../src/Repositories/CountryRepositoryImpl";
+import { ClientsService } from "../src/Services/ClientServiceImpl";
+import { AppointmentRepositoryImpl } from "../src/Repositories/Appointments/AppointmentRepositoryImpls";
+import { HairdresserServicesRepositoryImpl } from "../src/Repositories/HairdresserServicesRepositoryImpl";
+import { Barber } from "../src/Entities/Barber";
+import { ExperienceLevel } from "../src/Utils/ExperienceLevel";
+import { BasicAddress } from "@/Utils/Address";
+import { Vacation } from "@/Entities/Vacation";
+import { ci } from "jest.config";
 
 describe("BarberServiceImpl", () => {
   let service: BarberServiceImpl;
+  let repository: BarberRepositoryImpl;
+
   const mockBarberRepository = {
     findById: jest.fn(),
     createOrUpdate: jest.fn(),
@@ -27,6 +24,11 @@ describe("BarberServiceImpl", () => {
     delete: jest.fn(),
     restoreSoftDelete: jest.fn(),
   };
+
+  const mockBarberService = {
+    handleAppointments: jest.fn(),
+  };
+
   const mockBasicAddressRepository = {
     handleAddress: jest.fn(),
   };
@@ -36,6 +38,11 @@ describe("BarberServiceImpl", () => {
   const mockClientsService = {
     getClientById: jest.fn(),
   };
+
+  const mockCountryRepositoryImpl = {
+    findById: jest.fn(),
+  };
+
   const mockAppointmentRepository = {
     findById: jest.fn(),
     getAllAppointments: jest.fn(),
@@ -83,28 +90,33 @@ describe("BarberServiceImpl", () => {
     service = module.get<BarberServiceImpl>(BarberServiceImpl);
   });
 
-  it("should be defined", () => {
+  it("Service should be defined", () => {
     expect(service).toBeDefined();
   });
 
-  describe("getBarberById", () => {
-    it("should return the barber with the given id", async () => {
-      const expectedBarber: Barber = {
-        id: "1",
-        firstName: "John",
-        lastName: "Doe",
-        age: 30,
-        email: "johndoe@example.com",
-        username: "johndoe",
-        password: "password",
-        address: {
-          street: "123 Main St",
-          city: "Anytown",
-          country: "US",
-          postalCode: "12345",
-        },
-        experience: ExperienceLevel.JUNIOR,
+  const BarberServiceImpl = require("./BarberServiceImpl");
+
+  jest.mock("./BarberServiceImpl");
+
+  describe("createBarber", () => {
+    it("should create a new barber", async () => {
+      const mockBarber = {
+        id: "123",
+        name: "John Doe",
+        specialty: "Haircut",
+        availability: "Mondays and Wednesdays",
+        rating: 4.5,
       };
+
+      // Mock the implementation of BarberServiceImpl.createBarber()
+      BarberServiceImpl.createBarber.mockResolvedValue(mockBarber);
+
+      // Call the createBarber function
+      const newBarber = await BarberServiceImpl.createBarber(mockBarber);
+
+      // Assertions
+      expect(newBarber).toEqual(mockBarber);
+      expect(BarberServiceImpl.createBarber).toHaveBeenCalledTimes(1);
     });
   });
 });

@@ -1,3 +1,4 @@
+import { FidelityLevel } from "@/Utils/FidelityLevel";
 import { Type } from "class-transformer";
 import {
   IsDefined,
@@ -19,9 +20,8 @@ export class CleintDto {
   @IsNotEmpty()
   public lastName: string;
 
-  @IsNumber()
   @IsOptional()
-  fidelityLevel: number;
+  fidelityLevel: FidelityLevel;
 
   @IsOptional()
   public status: string;
