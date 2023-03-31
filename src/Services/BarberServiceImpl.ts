@@ -45,6 +45,8 @@ export class BarberServiceImpl {
     return await this.barberRepository.findById(id);
   }
 
+  private readonly appointmentsCache = new Map<string, Year>();
+
   async create(
     firstName: string,
     lastName: string,
@@ -92,8 +94,13 @@ export class BarberServiceImpl {
     return this.barberRepository.createOrUpdate(newBarber);
   }
 
-  //TODO ADD function response to cache
   public handleAppointments(): Year {
+    const cacheKey = new Date().getFullYear().toString();
+    const cachedResult = this.appointmentsCache.get(cacheKey);
+    if (cachedResult) {
+      return cachedResult;
+    }
+
     let appointments: Appointment[] = new Array<Appointment>();
     let months: Month[] = new Array<Month>();
 
@@ -110,7 +117,9 @@ export class BarberServiceImpl {
       months.push(new Month(currentMonthDays, month));
     }
 
-    return new Year(months);
+    const result = new Year(months);
+    this.appointmentsCache.set(cacheKey, result);
+    return result;
   }
 
   private daysInMonth(month: number, year: number) {
@@ -393,7 +402,6 @@ export class BarberServiceImpl {
       return;
     }
 
-    // Add the vacation to the list of active vacations
     const vacation = new Vacation(startDate, endDate);
     barber.addVacations(vacation);
 
