@@ -107,4 +107,34 @@ export class MailSenderService {
       }
     });
   }
+
+  public sendInvoiceToClient(email: string, pdfBuffer: Buffer) {
+    const transporter = nodemailer.createTransport({
+      host: "smtp.zoho.eu",
+      port: 465,
+      secure: true, // use SSL
+      auth: { user: "aleonorbarbershop@zohomail.eu", pass: "ParolaGrea1" },
+    });
+
+    const mailOptions = {
+      from: "aleonorbarbershop@zohomail.eu",
+      to: "aleonornyikita@gmail.com",
+      subject: "Email confirmation",
+      text: `Your invoice`,
+      attachments: [
+        {
+          filename: `Invoice #yourInvoice.pdf`,
+          content: pdfBuffer,
+        },
+      ],
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(info);
+      }
+    });
+  }
 }

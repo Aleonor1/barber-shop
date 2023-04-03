@@ -20,6 +20,7 @@ export class BarberRepositoryImpl implements UserRepository {
   async findById(id: string): Promise<Barber> {
     return this.barberRepository
       .createQueryBuilder("barber")
+      .leftJoinAndSelect("barber.vacations", "vacations")
       .where("barber.id = :id", {
         id,
       })
@@ -109,6 +110,7 @@ export class BarberRepositoryImpl implements UserRepository {
       .leftJoinAndSelect("months.days", "days")
       .leftJoinAndSelect("days.appointments", "appointments")
       .leftJoinAndSelect("appointments.client", "client")
+      .leftJoinAndSelect("barber.vacations", "vacations")
       .where("barber.id = :id", {
         id,
       })

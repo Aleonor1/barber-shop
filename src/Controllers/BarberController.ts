@@ -226,4 +226,21 @@ export class BarberController {
       response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
     }
   }
+
+  @Post("/appointmentCompleted/:barberId/:appointmentId")
+  async completeAppointment(
+    @Param("barberId") barberId: string,
+    @Param("appointmentId") appointmentId: string,
+    @Res() response: Response
+  ): Promise<void> {
+    try {
+      const result = await this.barberService.completeAppointment(
+        barberId,
+        appointmentId
+      );
+      response.status(HttpStatus.OK).json(result).send();
+    } catch (exception) {
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
+    }
+  }
 }

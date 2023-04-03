@@ -21,6 +21,7 @@ import { AppointmentNotFoundError } from "src/Utils/CustomErrors/AppointmentNotF
 import { UpdateBarberDto } from "src/DTOS/UpdateBarberDto.dts";
 import { Vacation } from "src/Entities/Vacation";
 import { AppointmentStatus } from "@/Utils/AppointmentStatus";
+import invoiceService from "@/Utils/GenerateInvoicePdf";
 
 Injectable();
 export class BarberServiceImpl {
@@ -267,7 +268,9 @@ export class BarberServiceImpl {
   }
 
   private async getBarberAndClient(barberId: string, clientId: string) {
-    const barber = await this.getBarberById(barberId);
+    const barber = await this.barberRepository.getBarberWithAppointments(
+      barberId
+    );
     if (!barber) {
       throw new BarberNotFoundError();
     }
@@ -406,5 +409,53 @@ export class BarberServiceImpl {
     barber.addVacations(vacation);
 
     this.barberRepository.update(barber.id, barber);
+  }
+
+  async completeAppointment(
+    barberId: string,
+    appointmentId: string
+  ): Promise<Appointment> {
+    try {
+      const [barber, appointment] = await Promise.all([
+        this.barberRepository.findById(barberId),
+        this.appointmentRepository.getAppointmentById(appointmentId),
+      ]);
+
+      if (!appointment) {
+        throw new Error(`Appointment with id ${appointmentId} not found`);
+      }
+
+      if (appointment.status === AppointmentStatus.COMPLETED) {
+        throw new Error(
+          `Appointment with id ${appointmentId} has already been completed`
+        );
+      }
+
+      const clinet = appointment.client;
+      appointment.status = AppointmentStatus.COMPLETED;
+
+      const invoice = {
+        invoiceNumber: "12345",
+        date: "2023-03-26",
+        clientName: "John Doe",
+        totalAmount: 123.45,
+        services: [appointment.service],
+        //TODO FINISh
+      };
+      const pdfBuffer = await invoiceService.generateInvoicePdf(
+        invoice,
+        appointment
+      );
+      const mailSender = await MailSenderService.getInstance();
+      mailSender.sendInvoiceToClient(clinet.email, pdfBuffer);
+      const updatedAppointment =
+        await this.appointmentRepository.createOrUpdate(appointment);
+
+      return updatedAppointment;
+    } catch (error) {
+      throw new Error(
+        `Failed to complete appointment with id ${appointmentId}: ${error.message}`
+      );
+    }
   }
 }

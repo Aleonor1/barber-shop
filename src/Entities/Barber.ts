@@ -72,7 +72,7 @@ export class Barber extends User {
       (findMonth) => findMonth.monthNumber === monthAsNumber
     );
 
-    const day = month.days.find((findDay) => {
+    const day = month?.days.find((findDay) => {
       return findDay.dayNumber == dayAsNumber;
     });
 

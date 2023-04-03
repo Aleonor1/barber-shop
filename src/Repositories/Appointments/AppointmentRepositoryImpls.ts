@@ -22,6 +22,7 @@ export class AppointmentRepositoryImpl {
       .createQueryBuilder("appointment")
       .select("appointment")
       .leftJoinAndSelect("appointment.client", "client")
+      .leftJoinAndSelect("appointment.service", "service")
       .where("appointment.id = :appointmentId", {
         appointmentId,
       })
