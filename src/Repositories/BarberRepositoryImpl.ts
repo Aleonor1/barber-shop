@@ -64,7 +64,6 @@ export class BarberRepositoryImpl implements UserRepository {
         age: barber.age,
         experience: barber.experience,
         nationalities: barber.nationalities,
-        address: barber.address,
       })
       .where("id = :id", { id: barber.id });
 

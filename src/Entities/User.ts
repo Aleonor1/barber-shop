@@ -34,10 +34,6 @@ export abstract class User {
   @Column()
   password: string;
 
-  @OneToOne(() => BasicAddress)
-  @JoinColumn()
-  address: BasicAddress;
-
   constructor(
     firstName: string,
     lastName: string,
@@ -52,7 +48,6 @@ export abstract class User {
     this.lastName = lastName;
     this.age = age;
     this.nationalities = nationalities;
-    this.address = address;
     this.email = email;
     this.username = username;
     this.password = password;

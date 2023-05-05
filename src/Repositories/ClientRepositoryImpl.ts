@@ -90,7 +90,6 @@ export class ClientRepositoryImpl implements UserRepository {
           email: client.email,
           fidelityLevel: client.fidelityLevel,
           nationalities: client.nationalities,
-          address: client.address,
           status: client.status,
           token: client.token,
           username: client.username,
@@ -117,7 +116,6 @@ export class ClientRepositoryImpl implements UserRepository {
         email: client.email,
         fidelityLevel: client.fidelityLevel,
         nationalities: client.nationalities,
-        address: client.address,
       })
       .where("id = :id", { id: client.id });
 

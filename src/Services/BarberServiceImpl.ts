@@ -67,13 +67,6 @@ export class BarberServiceImpl {
     id?: string
   ): Promise<Barber> {
     this.logger.log(`Creating new barber`);
-    const address = await this.basicAddressRepository.handleAddress(
-      addressName,
-      city,
-      country,
-      street,
-      postalCode
-    );
     let countriesFromDb: Country[];
 
     nationalities.forEach(
@@ -86,7 +79,6 @@ export class BarberServiceImpl {
       .setLastName(lastName)
       .setFirstName(firstName)
       .setAge(age)
-      .setAddress(address)
       .setExperience(experience)
       .setNationalities(countriesFromDb)
       .setEmail(email)
