@@ -30,6 +30,9 @@ export class Barber extends User {
   @JoinColumn()
   year: Year;
 
+  @Column({ default: "" })
+  description: string;
+
   @OneToMany(() => Vacation, (vacation) => vacation.barber, {
     cascade: ["insert", "update"],
   })
@@ -45,6 +48,7 @@ export class Barber extends User {
     username: string,
     password: string,
     year: Year,
+    description: string,
     experience?: ExperienceLevel,
     nationalities?: Country[]
   ) {
@@ -60,6 +64,7 @@ export class Barber extends User {
     );
     this.experience = experience;
     this.year = year;
+    this.description = description;
   }
 
   public getAppointment(

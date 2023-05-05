@@ -28,27 +28,23 @@ export class ClientsController {
   ) {}
 
   @Post()
-  create(@Body() body: CleintDto, @Res() response: Response) {
+  create(@Body() body: any, @Res() response: Response) {
     try {
+      console.log(body);
       const client = this.clientsService.create(
         body.firstName,
         body.lastName,
-        body.age,
-        body.street,
-        body.city,
-        body.country,
-        body.postalCode,
-        body.addressName,
+        body.birthday,
         body.email,
-        body.nationalities,
-        body.username,
-        body.password
+        body.password,
+        body.username
       );
 
       if (client) {
         response.status(HttpStatus.CREATED).json(client).send();
       }
     } catch (exception) {
+      console.log(exception);
       response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
     }
   }

@@ -21,6 +21,7 @@ export class BarberBuilderImpl implements UserBuilder {
   public password: string;
   public year: Year;
   public vacation: Vacation[];
+  public description: string;
 
   public setExperience(experience: ExperienceLevel) {
     this.experience = experience;
@@ -39,6 +40,11 @@ export class BarberBuilderImpl implements UserBuilder {
 
   public setPassword(password: string) {
     this.password = password;
+    return this;
+  }
+
+  public setDescription(description: string) {
+    this.description = description;
     return this;
   }
 
@@ -92,6 +98,7 @@ export class BarberBuilderImpl implements UserBuilder {
       this.username,
       this.password,
       this.year,
+      this.description,
       this.experience,
       this.nationalities
     );

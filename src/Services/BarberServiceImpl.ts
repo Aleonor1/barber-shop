@@ -61,7 +61,9 @@ export class BarberServiceImpl {
     email: string,
     username: string,
     password: string,
+    description: string,
     addressName?: string,
+
     id?: string
   ): Promise<Barber> {
     this.logger.log(`Creating new barber`);
@@ -90,6 +92,7 @@ export class BarberServiceImpl {
       .setEmail(email)
       .setUsername(username)
       .setPassword(password)
+      .setDescription(description)
       .setYear(year)
       .build();
     return this.barberRepository.createOrUpdate(newBarber);
@@ -98,9 +101,9 @@ export class BarberServiceImpl {
   public handleAppointments(): Year {
     const cacheKey = new Date().getFullYear().toString();
     const cachedResult = this.appointmentsCache.get(cacheKey);
-    if (cachedResult) {
-      return cachedResult;
-    }
+    // if (cachedResult) {
+    //   return cachedResult;
+    // }
 
     let appointments: Appointment[] = new Array<Appointment>();
     let months: Month[] = new Array<Month>();
@@ -130,6 +133,13 @@ export class BarberServiceImpl {
   async getAllBarbers(): Promise<[Barber[], number]> {
     this.logger.log(`Get all barbers`);
     return await this.barberRepository.getAllBarbers();
+  }
+
+  async getAllBarbersIds(): Promise<string[]> {
+    this.logger.log(`Get All barbers ids`);
+    const [barbers, totalBarbers] = await this.getAllBarbers();
+    const ids: string[] = barbers.map((barber) => barber.id);
+    return ids;
   }
 
   async updateBarber(
@@ -340,8 +350,8 @@ export class BarberServiceImpl {
     const barber =
       await this.barberRepository.getBarberWithAppointmentsOnSpecificDate(
         barberId,
-        dayNumber,
-        monthNumber
+        monthNumber,
+        dayNumber
       );
 
     if (!barber) {

@@ -49,15 +49,33 @@ export class BarberController {
     try {
       const barbers = await this.barberService.getAllBarbers();
       if (barbers) {
-        response.status(HttpStatus.OK).json(barbers).send();
+        response.status(HttpStatus.OK).json(barbers);
         return barbers;
       } else if (!barbers) {
-        response.status(HttpStatus.NO_CONTENT).json().send();
+        response.status(HttpStatus.NO_CONTENT).json();
       } else {
-        response.status(HttpStatus.NO_CONTENT).json().send();
+        response.status(HttpStatus.NO_CONTENT).json();
       }
     } catch (exception) {
-      response.status(HttpStatus.BAD_REQUEST).json().send();
+      response.status(HttpStatus.BAD_REQUEST).json();
+    }
+  }
+
+  @Get("/ids")
+  async getAllBarbersIds(@Res() response: Response): Promise<string[]> {
+    try {
+      const barbers = await this.barberService.getAllBarbersIds();
+      if (barbers && barbers.length) {
+        response.status(HttpStatus.OK).json(barbers);
+        return barbers;
+      } else if (!barbers) {
+        response.status(HttpStatus.NO_CONTENT).json();
+      } else {
+        response.status(HttpStatus.NO_CONTENT).json();
+      }
+    } catch (exception) {
+      console.log(exception);
+      response.status(HttpStatus.BAD_REQUEST).json();
     }
   }
 
@@ -197,7 +215,7 @@ export class BarberController {
     @Res() response: Response,
     @Query() query: DayAndMonthQueryParams
   ): Promise<Appointment[]> {
-    const [month, day] = [query.month - 1, query.day];
+    const [month, day] = [query.month, query.day];
     try {
       const appointments =
         await this.barberService.getAllBarberFreeAppointmentsOnSpecificDate(
@@ -206,10 +224,11 @@ export class BarberController {
           day
         );
 
-      response.status(HttpStatus.OK).json(appointments).send();
+      response.status(HttpStatus.OK).json(appointments);
       return appointments;
     } catch (exception) {
-      response.status(HttpStatus.OK).json(exception.message).send();
+      console.log(exception);
+      response.status(HttpStatus.OK).json(exception.message);
     }
   }
 

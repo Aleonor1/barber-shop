@@ -27,34 +27,17 @@ export class ClientsService {
   async create(
     firstName: string,
     lastName: string,
-    age: number,
-    street: string,
-    city: string,
-    country: string,
-    postalCode: string,
-    addressName: string,
+    birthday: Date,
     email: string,
-    nationalities: Country[],
-    username: string,
-    password: string
+    password: string,
+    username: string
   ): Promise<Client> {
-    let address = await this.basicAddressRepository.handleAddress(
-      addressName,
-      city,
-      country,
-      street,
-      postalCode
-    );
-
     const verifyToken = this.generateToken();
 
     const newClient = new ClientBuilderImpl()
       .setLastName(lastName)
       .setFirstName(firstName)
-      .setAge(age)
-      .setAddress(address)
       .setEmail(email)
-      .setNationalities(nationalities)
       .setFidelityLevel(0)
       .setToken(verifyToken)
       .setUsername(username)
