@@ -8,7 +8,7 @@ import { statusEnum } from "src/EmailConfirmation/Status";
 export class ClientBuilderImpl implements UserBuilder {
   public firstName: string;
   public lastName: string;
-  public age: number;
+  public birthdate: Date;
   public nationalities: Country[];
   public address: BasicAddress;
   public deletedAt?: Date;
@@ -44,8 +44,8 @@ export class ClientBuilderImpl implements UserBuilder {
     return this;
   }
 
-  public setAge(age: number) {
-    this.age = age;
+  public setBirthdate(birthdate: Date) {
+    this.birthdate = birthdate;
     return this;
   }
 
@@ -83,7 +83,7 @@ export class ClientBuilderImpl implements UserBuilder {
     return new Client(
       this.lastName,
       this.firstName,
-      this.age,
+      this.birthdate,
       this.address,
       this.email,
       this.token,

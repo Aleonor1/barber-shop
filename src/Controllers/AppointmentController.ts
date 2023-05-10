@@ -101,6 +101,7 @@ export class AppointmentController {
       );
       return;
     } catch (exception) {
+      console.log(exception);
       if (
         exception instanceof BarberNotFoundError ||
         exception instanceof ClientNotFoundError

@@ -45,14 +45,29 @@ export class ClientsService {
       .build();
 
     const dbClient = await this.clientRepositoryImpl.createOrUpdate(newClient);
+    this.sendConfirmationMail(dbClient);
+
+    return dbClient;
+  }
+
+  public async sendConfirmationMail(
+    dbClient: Client | string
+  ): Promise<string> {
+    if (typeof dbClient === "string") {
+      dbClient = await this.findOne(dbClient);
+    }
     const mailSender = MailSenderService.getInstance();
-    mailSender.sendMail(
+    const info = mailSender.sendMail(
       "aleonornyikita@gmail.com",
       dbClient.token,
       dbClient.id
     );
 
-    return dbClient;
+    return info;
+  }
+
+  async findByAnyField(field: string, value: string) {
+    return await this.clientRepositoryImpl.findByGeneric(field, value);
   }
 
   async updateClinet(

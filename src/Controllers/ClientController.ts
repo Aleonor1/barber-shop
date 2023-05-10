@@ -18,6 +18,7 @@ import { Response } from "express";
 import { Appointment } from "src/Entities/Appointments/Appointment";
 import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
 import { UpdateClientDto } from "@/DTOS/UpdateClientDto.dts";
+import jwt from "jsonwebtoken";
 
 @Controller("clients")
 export class ClientsController {
@@ -28,10 +29,10 @@ export class ClientsController {
   ) {}
 
   @Post()
-  create(@Body() body: any, @Res() response: Response) {
+  async create(@Body() body: any, @Res() response: Response) {
     try {
       console.log(body);
-      const client = this.clientsService.create(
+      const client = await this.clientsService.create(
         body.firstName,
         body.lastName,
         body.birthday,
@@ -40,12 +41,10 @@ export class ClientsController {
         body.username
       );
 
-      if (client) {
-        response.status(HttpStatus.CREATED).json(client).send();
-      }
+      response.status(HttpStatus.CREATED).json(client);
     } catch (exception) {
       console.log(exception);
-      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message);
     }
   }
 
@@ -73,6 +72,58 @@ export class ClientsController {
     }
   }
 
+  @Post(":id/sendConfirmationLink")
+  async sendConfirmationMail(
+    @Param("id") id: string,
+    @Res() response: Response
+  ): Promise<string> {
+    try {
+      const info = await this.clientsService.sendConfirmationMail(id);
+      console.log("a");
+
+      if (info) {
+        response.status(HttpStatus.OK).json(info);
+        return info;
+      } else if (info === undefined) {
+        response.status(HttpStatus.NOT_FOUND).json();
+      }
+    } catch (exception) {
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message);
+    }
+  }
+
+  @Post("login")
+  async login(
+    @Body() body: { username: string; password: string },
+    @Res() response: Response
+  ) {
+    try {
+      const { username, password } = body;
+
+      const client = await this.clientsService.findByAnyField(
+        "userName",
+        username
+      );
+
+      if (!client) {
+        throw new Error("Invalid credentials");
+      }
+
+      const token = jwt.sign({ id: client.id }, "your-secret-key-here", {
+        expiresIn: "1h",
+      });
+
+      const passwordMatches = password === client.password;
+      if (!passwordMatches) {
+        response.status(HttpStatus.BAD_REQUEST).json("Invalid credentials");
+      }
+
+      response.status(HttpStatus.OK).json({ token: token, user: client });
+    } catch (exception) {
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message);
+    }
+  }
+
   @Patch(":id")
   async updateClient(
     @Param("id") id: string,
@@ -85,9 +136,7 @@ export class ClientsController {
         updateClientDto
       );
       return updateClient;
-    } catch (error) {
-      response.status(HttpStatus.BAD_REQUEST).json(error.message).send();
-    }
+    } catch (error) {}
   }
 
   @Delete(":id")

@@ -61,7 +61,7 @@ export class BarberRepositoryImpl implements UserRepository {
       .set({
         firstName: barber.firstName,
         lastName: barber.lastName,
-        age: barber.age,
+        birthdate: barber.birthdate,
         experience: barber.experience,
         nationalities: barber.nationalities,
       })

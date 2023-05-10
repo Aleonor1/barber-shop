@@ -22,6 +22,7 @@ export class BarberBuilderImpl implements UserBuilder {
   public year: Year;
   public vacation: Vacation[];
   public description: string;
+  public birthdate: Date;
 
   public setExperience(experience: ExperienceLevel) {
     this.experience = experience;
@@ -92,7 +93,7 @@ export class BarberBuilderImpl implements UserBuilder {
     return new Barber(
       this.lastName,
       this.firstName,
-      this.age,
+      this.birthdate,
       this.address,
       this.email,
       this.username,

@@ -21,15 +21,15 @@ export abstract class User {
   @Column()
   lastName: string;
 
-  @Column({ nullable: false, type: "integer", default: 0 })
-  age: number;
+  @Column({ nullable: true, type: "date" })
+  birthdate: Date;
 
   @OneToOne(() => Country)
   @JoinColumn()
   nationalities: Country[];
 
   @Column()
-  username: string;
+  userName: string;
 
   @Column()
   password: string;
@@ -37,19 +37,19 @@ export abstract class User {
   constructor(
     firstName: string,
     lastName: string,
-    age: number,
+    birthdate: Date,
     nationalities: Country[],
     address: BasicAddress,
     email: string,
-    username: string,
+    userName: string,
     password: string
   ) {
     this.firstName = firstName;
     this.lastName = lastName;
-    this.age = age;
+    this.birthdate = birthdate;
     this.nationalities = nationalities;
     this.email = email;
-    this.username = username;
+    this.userName = userName;
     this.password = password;
   }
 

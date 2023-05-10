@@ -84,7 +84,7 @@ export class MailSenderService {
     mail: string,
     token: string,
     id: string
-  ): Promise<void> {
+  ): Promise<string> {
     const transporter = nodemailer.createTransport({
       host: "smtp.zoho.eu",
       port: 465,
@@ -99,13 +99,14 @@ export class MailSenderService {
       text: `Click on the following link to activate your account: http://localhost:3000/clients/verify/${id}/${token}}`,
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log(error);
-      } else {
-        console.log(info);
-      }
-    });
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`Email sent: ${info.messageId}`);
+      return info.messageId;
+    } catch (error) {
+      return error;
+      console.log(`Error sending email: ${error}`);
+    }
   }
 
   public sendInvoiceToClient(email: string, pdfBuffer: Buffer) {

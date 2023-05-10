@@ -42,7 +42,7 @@ export class Barber extends User {
   constructor(
     lastName: string,
     firstName: string,
-    age: number,
+    birthdate: Date,
     address: BasicAddress,
     email: string,
     username: string,
@@ -55,7 +55,7 @@ export class Barber extends User {
     super(
       lastName,
       firstName,
-      age,
+      birthdate,
       nationalities,
       address,
       email,
@@ -107,8 +107,8 @@ export class Barber extends User {
     return `Barber: 
     Last Name : ${this.lastName}
     First Name: ${this.firstName}
-    Age: ${this.age}, 
-    Username: ${this.username}, 
+    Age: ${this.birthdate}, 
+    Username: ${this.userName}, 
     Experience: ${this.experience}, 
     Nationalities: ${this.nationalities}`;
   }

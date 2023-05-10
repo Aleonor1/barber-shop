@@ -4,7 +4,7 @@ import { BasicAddress } from "src/Utils/Address";
 export interface UserBuilder {
   firstName: string;
   lastName: string;
-  age: number;
+  birthdate: Date;
   nationalities: Country[];
   address: BasicAddress;
   deletedAt?: Date;

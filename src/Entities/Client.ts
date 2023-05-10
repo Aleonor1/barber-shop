@@ -28,22 +28,22 @@ export class Client extends User {
   constructor(
     lastName: string,
     firstName: string,
-    age: number,
+    birthdate: Date,
     address: BasicAddress,
     email: string,
     token: string,
-    username: string,
+    userName: string,
     password: string,
     nationalities?: Country[]
   ) {
     super(
       lastName,
       firstName,
-      age,
+      birthdate,
       nationalities,
       address,
       email,
-      username,
+      userName,
       password
     );
     this.status = statusEnum.pending;
@@ -54,8 +54,8 @@ export class Client extends User {
     return `Client: 
     Last Name : ${this.lastName}
     First Name: ${this.firstName}
-    Age: ${this.age}, 
-    Username: ${this.username}, 
+    Age: ${this.birthdate}, 
+    Username: ${this.userName}, 
     Experience: ${this.fidelityLevel}, 
     Nationalities: ${this.nationalities}`;
   }
