@@ -203,13 +203,15 @@ export class ClientsController {
         const appointments =
           await this.appointmentRepository.getAllClientAppointmnts(id);
 
-        response.status(HttpStatus.OK).json(appointments).send();
+        response.status(HttpStatus.OK).json(appointments);
         return appointments;
       } else if (client === undefined) {
-        response.status(HttpStatus.NOT_FOUND).json().send();
+        response.status(HttpStatus.NOT_FOUND).json();
+      } else {
+        response.status(HttpStatus.BAD_REQUEST).json();
       }
     } catch (exception) {
-      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message);
     }
   }
 }

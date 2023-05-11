@@ -85,16 +85,6 @@ export class ClientsService {
     const { nationalities, status, fidelityLevel, ...userData } =
       updateClientDto;
     const updateClient = Object.assign(client, userData);
-    //TODO FINISH
-    // if (nationalities) {
-    //   let countriesFromDb: Country[];
-
-    //   nationalities.forEach(
-    //     async (coun) => await this.countryRepositoryImpl.findById(coun)
-    //   );
-
-    //   updateClient.nationalities = countriesFromDb;
-    // }
     if (fidelityLevel) {
       updateClient.fidelityLevel = fidelityLevel;
     }

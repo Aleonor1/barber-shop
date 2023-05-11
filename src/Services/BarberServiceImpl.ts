@@ -22,6 +22,7 @@ import { UpdateBarberDto } from "src/DTOS/UpdateBarberDto.dts";
 import { Vacation } from "src/Entities/Vacation";
 import { AppointmentStatus } from "@/Utils/AppointmentStatus";
 import invoiceService from "@/Utils/GenerateInvoicePdf";
+import { FidelityLevel } from "src/Utils/FidelityLevel";
 
 Injectable();
 export class BarberServiceImpl {
@@ -239,7 +240,7 @@ export class BarberServiceImpl {
       throw new Error("Barber has vacation");
     }
     let appointment = barber.getAppointment(month, day, from, to);
-    if (appointment.booked) {
+    if (appointment?.booked) {
       throw new Error("Appointment is already booked");
     }
 
@@ -249,17 +250,55 @@ export class BarberServiceImpl {
       appointment.setService(hairDresserService);
       appointment.setClient(client);
       appointment.setBooked(true);
+      appointment.setDate(date);
+      appointment.setPrice(
+        this.calculatePrice(
+          hairDresserService.price,
+          barber.experience,
+          client.fidelityLevel
+        )
+      );
       await this.appointmentRepository.createOrUpdate(appointment);
     }
 
-    await this.sendEmailCreatedAppointment(appointment, barber);
+    this.sendEmailCreatedAppointment(appointment, barber);
     return appointment;
+  }
+
+  private calculatePrice(
+    servicePrice: number,
+    barberExperience: ExperienceLevel,
+    clientFidelityLevel: FidelityLevel
+  ): number {
+    let experienceMultiplier = 1;
+    switch (barberExperience) {
+      case ExperienceLevel.JUNIOR:
+        experienceMultiplier = 0.8;
+        break;
+      case ExperienceLevel.SENIOR:
+        experienceMultiplier = 1.2;
+        break;
+    }
+
+    let fidelityMultiplier = 1;
+    switch (clientFidelityLevel) {
+      case FidelityLevel.SILVER:
+        fidelityMultiplier = 0.9;
+        break;
+      case FidelityLevel.GOLD:
+        fidelityMultiplier = 0.8;
+        break;
+    }
+
+    const finalPrice = servicePrice * experienceMultiplier * fidelityMultiplier;
+
+    return finalPrice;
   }
 
   private async sendEmailCreatedAppointment(
     appointment: Appointment,
     barber: Barber
-  ) {
+  ): Promise<void> {
     const mailSender = MailSenderService.getInstance();
     await mailSender.sendMailAppointmentToBarber(
       "aleonornyikita@gmail.com",

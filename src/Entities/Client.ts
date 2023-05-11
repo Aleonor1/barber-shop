@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  JoinColumn,
+} from "typeorm";
 import { User } from "./User";
 import { BasicAddress } from "src/Utils/Address";
 import { Country } from "./Country";
@@ -21,6 +27,10 @@ export class Client extends User {
     default: statusEnum.pending,
   })
   status: statusEnum;
+
+  @OneToMany(() => Appointment, (appointment) => appointment.client)
+  @JoinColumn()
+  appointments: Appointment[];
 
   @Column()
   token: string;

@@ -60,6 +60,25 @@ export class AppointmentController {
     }
   }
 
+  @Post("/:id/cancel")
+  async cancelAppointment(
+    @Param("id") id: string,
+    @Res() response: Response
+  ): Promise<void> {
+    try {
+      const appointment = await this.appointmentService.getAppointmentById(id);
+      if (appointment) {
+        await this.appointmentService.cancelAppointment(id);
+        response.status(HttpStatus.OK).json().send();
+      } else {
+        response.status(HttpStatus.NOT_FOUND).json().send();
+      }
+    } catch (exception) {
+      console.log(exception);
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
+    }
+  }
+
   @Get("/:barberId")
   async getAllBarberAppointmentsOnDay(
     @Param("barberId") barberId: string,
@@ -106,9 +125,9 @@ export class AppointmentController {
         exception instanceof BarberNotFoundError ||
         exception instanceof ClientNotFoundError
       ) {
-        response.status(HttpStatus.NOT_FOUND).json(exception.message).send();
+        response.status(HttpStatus.NOT_FOUND).json(exception.message);
       } else {
-        response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
+        response.status(HttpStatus.BAD_REQUEST).json(exception.message);
       }
     }
   }

@@ -1,8 +1,17 @@
-import { Column, Double, Entity, PrimaryColumn } from "typeorm";
+import {
+  Column,
+  Double,
+  Entity,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 
 @Entity("hairdresser_service")
 export class HairdresserService {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
+  id: string;
+
+  @Column({ nullable: true })
   code: string;
 
   @Column()

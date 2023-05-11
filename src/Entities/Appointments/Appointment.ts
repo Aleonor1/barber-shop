@@ -2,7 +2,6 @@ import {
   Column,
   Entity,
   JoinColumn,
-  ManyToMany,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -30,8 +29,7 @@ export class Appointment {
   @Column({ default: false })
   booked: boolean;
 
-  @OneToOne(() => Client, { cascade: ["insert", "update"] })
-  @JoinColumn()
+  @ManyToOne(() => Client, (client) => client.appointments)
   client: Client;
 
   @OneToOne(() => HairdresserService, {
@@ -44,6 +42,9 @@ export class Appointment {
 
   @ManyToOne(() => Day, (day) => day.appointments)
   day: Day;
+
+  @Column({ nullable: true })
+  date: Date;
 
   @Column({
     type: "enum",
@@ -71,6 +72,10 @@ export class Appointment {
 
   public setService(service: HairdresserService): void {
     this.service = service;
+  }
+
+  public setDate(date: Date): void {
+    this.date = date;
   }
 
   public setClient(client: Client): void {

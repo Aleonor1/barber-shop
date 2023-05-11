@@ -46,9 +46,13 @@ export class AppointmentRepositoryImpl {
       .createQueryBuilder("appointment")
       .select("appointment")
       .leftJoinAndSelect("appointment.client", "client")
-      .where("client.id = :id", {
-        id,
-      })
+      .leftJoinAndSelect("appointment.day", "day")
+      .leftJoinAndSelect("day.month", "month")
+      .leftJoinAndSelect("month.year", "year")
+      .leftJoinAndSelect("appointment.service", "service")
+      // .leftJoinAndSelect("year.barber", "barber")
+      .where("client.id = :id", { id })
+      .andWhere("appointment.status != :status", { status: "cancelled" })
       .getMany();
   }
 

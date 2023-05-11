@@ -61,15 +61,15 @@ export class AppointmentServiceImpl {
     );
   }
 
-  //TODO FINISH
-  // async cancelAppointment(id: string): Promise<Appointment> {
-  //   const appointment = await this.appointmentRepository.getAppointmentById(id);
-  //   if (!appointment) {
-  //     throw new Error(`Appointment with id ${id} not found.`);
-  //   }
-  //   appointment.isCancelled = true;
-  //   return this.appointmentRepository.createOrUpdate(appointment);
-  // }
+  public async cancelAppointment(id: string): Promise<void> {
+    const appointment = await this.appointmentRepository.getAppointmentById(id);
+    if (!appointment) {
+      throw new Error(`Appointment with id ${id} not found.`);
+    }
+    appointment.cancel();
+    this.appointmentRepository.createOrUpdate(appointment);
+    return null;
+  }
 
   async completeAppointment(id: string): Promise<Appointment> {
     const appointment = await this.appointmentRepository.getAppointmentById(id);
