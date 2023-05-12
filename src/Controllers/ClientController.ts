@@ -12,11 +12,13 @@ import {
 } from "@nestjs/common";
 import { ClientsService } from "../Services/ClientServiceImpl";
 import { Client } from "src/Entities/Client";
+import { Barber } from "src/Entities/Barber";
 import { CleintDto } from "src/DTOS/ClientDto.dts";
 import { statusEnum } from "src/EmailConfirmation/Status";
 import { Response } from "express";
 import { Appointment } from "src/Entities/Appointments/Appointment";
 import { AppointmentRepositoryImpl } from "src/Repositories/Appointments/AppointmentRepositoryImpls";
+import { BarberRepositoryImpl } from "src/Repositories/BarberRepositoryImpl";
 import { UpdateClientDto } from "@/DTOS/UpdateClientDto.dts";
 import jwt from "jsonwebtoken";
 
@@ -25,7 +27,9 @@ export class ClientsController {
   constructor(
     private readonly clientsService: ClientsService,
     @Inject(AppointmentRepositoryImpl)
-    private readonly appointmentRepository: AppointmentRepositoryImpl
+    private readonly appointmentRepository: AppointmentRepositoryImpl,
+    @Inject(BarberRepositoryImpl)
+    private readonly barberRepositoryImpl: BarberRepositoryImpl
   ) {}
 
   @Post()
@@ -62,13 +66,13 @@ export class ClientsController {
       const client = await this.clientsService.findOne(id);
 
       if (client) {
-        response.status(HttpStatus.OK).json(client).send();
+        response.status(HttpStatus.OK).json(client);
         return client;
       } else if (client === undefined) {
-        response.status(HttpStatus.NOT_FOUND).json().send();
+        response.status(HttpStatus.NOT_FOUND).json();
       }
     } catch (exception) {
-      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message);
     }
   }
 
@@ -145,12 +149,12 @@ export class ClientsController {
       const client = await this.clientsService.deleteClient(id);
 
       if (client.deletedAt) {
-        response.status(HttpStatus.OK).json().send();
+        response.status(HttpStatus.OK).json();
       } else if (!client) {
-        response.status(HttpStatus.NOT_FOUND).json().send();
+        response.status(HttpStatus.NOT_FOUND).json();
       }
     } catch (exception) {
-      response.status(HttpStatus.BAD_REQUEST).json(exception.messages).send();
+      response.status(HttpStatus.BAD_REQUEST).json(exception.messages);
     }
   }
 
@@ -164,12 +168,12 @@ export class ClientsController {
       const client = await this.clientsService.verify(token, userId);
 
       if (client && client.status === statusEnum.active) {
-        response.status(HttpStatus.ACCEPTED).json().send();
+        response.status(HttpStatus.ACCEPTED).json();
       } else if (!client) {
-        response.status(HttpStatus.NOT_FOUND).json().send();
+        response.status(HttpStatus.NOT_FOUND).json();
       }
     } catch (exception) {
-      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message);
     }
   }
 
@@ -182,12 +186,12 @@ export class ClientsController {
       const client = await this.clientsService.restoreSoftDelete(id);
 
       if (client && !client.deletedAt) {
-        response.status(HttpStatus.ACCEPTED).json(client).send();
+        response.status(HttpStatus.ACCEPTED).json(client);
       } else if (!client) {
-        response.status(HttpStatus.NOT_FOUND).json().send();
+        response.status(HttpStatus.NOT_FOUND).json();
       }
     } catch (exception) {
-      response.status(HttpStatus.BAD_REQUEST).json(exception.message).send();
+      response.status(HttpStatus.BAD_REQUEST).json(exception.message);
     }
   }
 
@@ -195,7 +199,7 @@ export class ClientsController {
   async getAppointments(
     @Param("id") id: string,
     @Res() response: Response
-  ): Promise<Appointment[]> {
+  ): Promise<{ appointment: Appointment; barber: Barber }[]> {
     try {
       const client = await this.clientsService.findOne(id);
 
@@ -203,8 +207,18 @@ export class ClientsController {
         const appointments =
           await this.appointmentRepository.getAllClientAppointmnts(id);
 
-        response.status(HttpStatus.OK).json(appointments);
-        return appointments;
+        const appointmentWithBarbers = await Promise.all(
+          appointments.map(async (appointment) => {
+            const barber =
+              await this.barberRepositoryImpl.getBarberByAppointmentId(
+                appointment.id
+              );
+
+            return { appointment, barber };
+          })
+        );
+        response.status(HttpStatus.OK).json(appointmentWithBarbers);
+        return appointmentWithBarbers;
       } else if (client === undefined) {
         response.status(HttpStatus.NOT_FOUND).json();
       } else {

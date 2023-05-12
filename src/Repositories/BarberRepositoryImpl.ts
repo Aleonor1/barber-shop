@@ -116,6 +116,20 @@ export class BarberRepositoryImpl implements UserRepository {
       .getOne();
   }
 
+  async getBarberByAppointmentId(appointmentId: string): Promise<Barber> {
+    return this.barberRepository
+      .createQueryBuilder("barber")
+      .select("barber")
+      .leftJoinAndSelect("barber.year", "year")
+      .leftJoinAndSelect("year.months", "months")
+      .leftJoinAndSelect("months.days", "days")
+      .leftJoinAndSelect("days.appointments", "appointments")
+      .where("appointments.id = :appointmentId", {
+        appointmentId,
+      })
+      .getOne();
+  }
+
   async getBarberWithAppointmentsOnSpecificDate(
     id: string,
     dayNumber: number,

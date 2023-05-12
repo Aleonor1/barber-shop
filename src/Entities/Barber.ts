@@ -70,8 +70,7 @@ export class Barber extends User {
   public getAppointment(
     monthAsNumber: number,
     dayAsNumber: number,
-    from: string,
-    to: string
+    from: string
   ): Appointment {
     const month = this?.year?.months?.find(
       (findMonth) => findMonth.monthNumber === monthAsNumber
@@ -82,7 +81,7 @@ export class Barber extends User {
     });
 
     const appointment = day.appointments.find((appointment) => {
-      return appointment.from == from && appointment.to == to;
+      return appointment.from == from;
     });
 
     return appointment;

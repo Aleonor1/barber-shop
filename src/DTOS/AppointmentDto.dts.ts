@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsNumber, IsString, isString } from "class-validator";
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  isString,
+  IsDate,
+} from "class-validator";
 import { HairdresserService } from "src/Entities/HairdresserService";
 
 export class AppointmentDto {
@@ -11,8 +17,8 @@ export class AppointmentDto {
   to: string;
 
   @IsNotEmpty()
-  @IsNumber()
-  month: number;
+  @IsString()
+  date: Date;
 
   @IsNotEmpty()
   @IsString()
@@ -25,8 +31,4 @@ export class AppointmentDto {
   @IsNotEmpty()
   @IsString()
   service: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  day: number;
 }

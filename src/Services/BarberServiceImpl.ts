@@ -239,7 +239,7 @@ export class BarberServiceImpl {
     if (barber.hasVacation(date)) {
       throw new Error("Barber has vacation");
     }
-    let appointment = barber.getAppointment(month, day, from, to);
+    let appointment = barber.getAppointment(month, day, from);
     if (appointment?.booked) {
       throw new Error("Appointment is already booked");
     }

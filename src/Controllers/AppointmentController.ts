@@ -94,9 +94,9 @@ export class AppointmentController {
           dayNumber
         );
       if (appointments) {
-        response.status(HttpStatus.OK).json(appointments).send();
+        response.status(HttpStatus.OK).json(appointments);
       } else {
-        response.status(HttpStatus.NOT_FOUND).json().send();
+        response.status(HttpStatus.NOT_FOUND).json();
       }
     } catch (exception) {
       console.log(exception);
@@ -107,18 +107,22 @@ export class AppointmentController {
   async createAppointment(
     @Body() body: AppointmentDto,
     @Res() response: Response
-  ): Promise<void> {
+  ): Promise<Appointment> {
     try {
-      await this.appointmentService.create(
+      const date = new Date(body.date);
+      const month = date.getMonth();
+      const day = date.getDate();
+      const appointment = await this.appointmentService.create(
         body.from,
-        body.to,
-        body.month,
+        body.from + 1,
+        month,
         body.clientId,
         body.barberId,
         body.service,
-        body.day
+        day
       );
-      return;
+      response.status(HttpStatus.CREATED).json(appointment);
+      return appointment;
     } catch (exception) {
       console.log(exception);
       if (
